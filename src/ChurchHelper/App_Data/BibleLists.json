@@ -1,0 +1,970 @@
+﻿{
+  "BibleList":
+
+  [
+
+ {
+        "id": 1,
+        "name": "Van-Dyke",
+        "language": "name",
+        "alignment": "right",
+        "testments": [
+          {
+            "id": "1",
+            "name": "العهد القديم",
+            "groups": [
+              {
+                "id": "01",
+                "name": "اسفار موسى الخمسة",
+                "books": [
+
+                  {
+                    "id": "01",
+                    "name": "التكوين",
+                    "chapterCount": "50",
+                    "abbreviation": "Gen"
+                  },
+                  {
+                    "id": "02",
+                    "name": "الخروج",
+                    "chapterCount": "40",
+                    "abbreviation": "Ex"
+                  },
+                  {
+                    "id": "03",
+                    "name": "لاويين",
+                    "chapterCount": "27",
+                    "abbreviation": "Lev"
+                  },
+                  {
+                    "id": "04",
+                    "name": "العدد",
+                    "chapterCount": "36",
+                    "abbreviation": "Num"
+                  },
+                  {
+                    "id": "05",
+                    "name": "التثنية",
+                    "chapterCount": "34",
+                    "abbreviation": "Deut"
+                  }
+                ]
+              },
+              {
+                "id": "02",
+                "name": "الأسفار التاريخية",
+                "books": [
+                  {
+                    "id": "06",
+                    "name": "يشوع",
+                    "chapterCount": "24",
+                    "abbreviation": "Josh"
+                  },
+                  {
+                    "id": "07",
+                    "name": "القضاة",
+                    "chapterCount": "21",
+                    "abbreviation": "Judg"
+                  },
+                  {
+                    "id": "08",
+                    "name": "راعوث",
+                    "chapterCount": "4",
+                    "abbreviation": "Ruth"
+                  },
+                  {
+                    "id": "09",
+                    "name": "صموئيل الأول",
+                    "chapterCount": "31",
+                    "abbreviation": "1 Sam"
+                  },
+                  {
+                    "id": "10",
+                    "name": "صموئيل الثاني",
+                    "chapterCount": "24",
+                    "abbreviation": "2 Sam"
+                  },
+                  {
+                    "id": "11",
+                    "name": "الملوك الأول",
+                    "chapterCount": "22",
+                    "abbreviation": "1 Kings"
+                  },
+                  {
+                    "id": "12",
+                    "name": "الملوك الثاني",
+                    "chapterCount": "25",
+                    "abbreviation": "2 Kings"
+                  },
+                  {
+                    "id": "13",
+                    "name": "أخبار الأيام الأول",
+                    "chapterCount": "29",
+                    "abbreviation": "1 Chr"
+                  },
+                  {
+                    "id": "14",
+                    "name": "أخبار الأيام الثاني",
+                    "chapterCount": "36",
+                    "abbreviation": "2 Chr"
+                  },
+                  {
+                    "id": "15",
+                    "name": "عزرا",
+                    "chapterCount": "10",
+                    "abbreviation": "Ezra"
+                  },
+                  {
+                    "id": "16",
+                    "name": "نحميا",
+                    "chapterCount": "13",
+                    "abbreviation": "Neh"
+                  },
+                  {
+                    "id": "17",
+                    "name": "أستير",
+                    "chapterCount": "10",
+                    "abbreviation": "Est"
+                  }
+                ]
+              },
+              {
+                "id": "03",
+                "name": "الأسفار الشعرية",
+                "books": [
+                  {
+                    "id": "18",
+                    "name": "أيوب",
+                    "chapterCount": "42",
+                    "abbreviation": "Job"
+                  },
+                  {
+                    "id": "19",
+                    "name": "المزامير",
+                    "chapterCount": "150",
+                    "abbreviation": "Ps"
+                  },
+                  {
+                    "id": "20",
+                    "name": "أمثال",
+                    "chapterCount": "31",
+                    "abbreviation": "Prov"
+                  },
+                  {
+                    "id": "21",
+                    "name": "الجامعة",
+                    "chapterCount": "12",
+                    "abbreviation": "Eccl"
+                  },
+                  {
+                    "id": "22",
+                    "name": "نشيدالأنشاد",
+                    "chapterCount": "8",
+                    "abbreviation": "Song"
+                  }
+                ]
+              },
+              {
+                "id": "04",
+                "name": "اسفار الأنبياء الكبار",
+                "books": [
+                  {
+                    "id": "23",
+                    "name": "إشعياء",
+                    "chapterCount": "66",
+                    "abbreviation": "Isa"
+                  },
+                  {
+                    "id": "24",
+                    "name": "إرميا",
+                    "chapterCount": "52",
+                    "abbreviation": "Jer"
+                  },
+                  {
+                    "id": "25",
+                    "name": "مراثي إرميا",
+                    "chapterCount": "5",
+                    "abbreviation": "Lam"
+                  },
+                  {
+                    "id": "26",
+                    "name": "حزقيال",
+                    "chapterCount": "48",
+                    "abbreviation": "Ezek"
+                  },
+                  {
+                    "id": "27",
+                    "name": "دانيال",
+                    "chapterCount": "12",
+                    "abbreviation": "Dan"
+                  }
+                ]
+              },
+              {
+                "id": "05",
+                "name": "اسفار الانبياء الصغار",
+                "books": [
+                  {
+                    "id": "28",
+                    "name": "هوشع",
+                    "chapterCount": "14",
+                    "abbreviation": "Hos"
+                  },
+                  {
+                    "id": "29",
+                    "name": "يوئيل",
+                    "chapterCount": "3",
+                    "abbreviation": "Joel"
+                  },
+                  {
+                    "id": "30",
+                    "name": "عاموس",
+                    "chapterCount": "9",
+                    "abbreviation": "Am"
+                  },
+                  {
+                    "id": "31",
+                    "name": "عوبديا",
+                    "chapterCount": "1",
+                    "abbreviation": "Ob"
+                  },
+                  {
+                    "id": "32",
+                    "name": "يونان",
+                    "chapterCount": "4",
+                    "abbreviation": "Jon"
+                  },
+                  {
+                    "id": "33",
+                    "name": "ميخا",
+                    "chapterCount": "7",
+                    "abbreviation": "Mic"
+                  },
+                  {
+                    "id": "34",
+                    "name": "ناحوم",
+                    "chapterCount": "3",
+                    "abbreviation": "Nah"
+                  },
+                  {
+                    "id": "35",
+                    "name": "حبقوق",
+                    "chapterCount": "3",
+                    "abbreviation": "Hab"
+                  },
+                  {
+                    "id": "36",
+                    "name": "صفنيا",
+                    "chapterCount": "3",
+                    "abbreviation": "Zeph"
+                  },
+                  {
+                    "id": "37",
+                    "name": "حجي",
+                    "chapterCount": "2",
+                    "abbreviation": "Hag"
+                  },
+                  {
+                    "id": "38",
+                    "name": "زكريا",
+                    "chapterCount": "14",
+                    "abbreviation": "Zech"
+                  },
+                  {
+                    "id": "39",
+                    "name": "ملاخي",
+                    "chapterCount": "4",
+                    "abbreviation": "Mal"
+                  }
+                ]
+              }
+            ]
+          },
+
+          {
+            "id": "2",
+            "name": "العهد الجديد",
+            "groups": [
+              {
+                "id": "06",
+                "name": "الاناجيل الأربعة",
+                "books": [
+                  {
+                    "id": "40",
+                    "name": "متى",
+                    "chapterCount": "28",
+                    "abbreviation": "Mt"
+                  },
+                  {
+                    "id": "41",
+                    "name": "مرقس",
+                    "chapterCount": "16",
+                    "abbreviation": "Mk"
+                  },
+                  {
+                    "id": "42",
+                    "name": "لوقا",
+                    "chapterCount": "24",
+                    "abbreviation": "Lk"
+                  },
+                  {
+                    "id": "43",
+                    "name": "يوحنا",
+                    "chapterCount": "21",
+                    "abbreviation": "Jn"
+                  }
+                ]
+              },
+              {
+                "id": "07",
+                "name": "أعمال الرسل",
+                "books": [
+                  {
+                    "id": "44",
+                    "name": "أعمال الرسل",
+                    "chapterCount": "28",
+                    "abbreviation": "Acts"
+                  }
+                ]
+              },
+              {
+                "id": "08",
+                "name": "رسائل بولس الرسول",
+                "books": [
+                  {
+                    "id": "45",
+                    "name": "رومية",
+                    "chapterCount": "16",
+                    "abbreviation": "Rom"
+                  },
+                  {
+                    "id": "46",
+                    "name": "كورنثوس الأولى",
+                    "chapterCount": "16",
+                    "abbreviation": "1 Cor"
+                  },
+                  {
+                    "id": "47",
+                    "name": "كورنثوس الثانية",
+                    "chapterCount": "13",
+                    "abbreviation": "2 Cor"
+                  },
+                  {
+                    "id": "48",
+                    "name": "غلاطية",
+                    "chapterCount": "6",
+                    "abbreviation": "Gal"
+                  },
+                  {
+                    "id": "49",
+                    "name": "أفسس",
+                    "chapterCount": "6",
+                    "abbreviation": "Eph"
+                  },
+                  {
+                    "id": "50",
+                    "name": "فيلبي",
+                    "chapterCount": "4",
+                    "abbreviation": "Phil"
+                  },
+                  {
+                    "id": "51",
+                    "name": "كولوسي",
+                    "chapterCount": "4",
+                    "abbreviation": "Col"
+                  },
+                  {
+                    "id": "52",
+                    "name": "تسالونيكي الأولى",
+                    "chapterCount": "5",
+                    "abbreviation": "1 Thess"
+                  },
+                  {
+                    "id": "53",
+                    "name": "تسالونيكي الثانية",
+                    "chapterCount": "5",
+                    "abbreviation": "2 Thess"
+                  },
+                  {
+                    "id": "54",
+                    "name": "تيموثاوس الأولى",
+                    "chapterCount": "6",
+                    "abbreviation": "1 Tim"
+                  },
+                  {
+                    "id": "55",
+                    "name": "تيموثاوس الثانية",
+                    "chapterCount": "4",
+                    "abbreviation": "2 Tim"
+                  },
+                  {
+                    "id": "56",
+                    "name": "تيطس",
+                    "chapterCount": "3",
+                    "abbreviation": "Titus"
+                  },
+                  {
+                    "id": "57",
+                    "name": "فليمون",
+                    "chapterCount": "1",
+                    "abbreviation": "Philemon"
+                  },
+                  {
+                    "id": "58",
+                    "name": "العبرانيين",
+                    "chapterCount": "13",
+                    "abbreviation": "Heb"
+                  }
+                ]
+              },
+              {
+                "id": "09",
+                "name": "رسائل الرسل",
+                "books": [
+                  {
+                    "id": "59",
+                    "name": "يعقوب",
+                    "chapterCount": "5",
+                    "abbreviation": "Jas"
+                  },
+                  {
+                    "id": "60",
+                    "name": "بطرس الأولى",
+                    "chapterCount": "5",
+                    "abbreviation": "1 بط"
+                  },
+                  {
+                    "id": "61",
+                    "name": "بطرس الثانية",
+                    "chapterCount": "3",
+                    "abbreviation": "2 بط"
+                  },
+                  {
+                    "id": "62",
+                    "name": "يوحنا الأولى",
+                    "chapterCount": "5",
+                    "abbreviation": "1 يو"
+                  },
+                  {
+                    "id": "63",
+                    "name": "يوحنا الثانية",
+                    "chapterCount": "1",
+                    "abbreviation": "2 يو"
+                  },
+                  {
+                    "id": "64",
+                    "name": "يوحنا الثالثة",
+                    "chapterCount": "1",
+                    "abbreviation": "3 بو"
+                  },
+                  {
+                    "id": "65",
+                    "name": "يهوذا",
+                    "chapterCount": "1",
+                    "abbreviation": "يهوذا"
+                  }
+                ]
+              },
+              {
+                "id": "10",
+                "name": "رؤيا يوحنا",
+                "books": [
+                  {
+                    "id": "66",
+                    "name": "رؤيا يوحنا",
+                    "chapterCount": "22",
+                    "abbreviation": "رؤ"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+
+
+    ,
+
+
+ {
+        "id": 2,
+        "name": "King James",
+        "language": "English",
+        "alignment": "left",
+        "testments": [
+          {
+            "id": "1",
+            "name": "Old Testment",
+            "groups": [
+              {
+                "id": "01",
+                "name": "Moses' Books",
+                "books": [
+
+                  {
+                    "id": "01",
+                    "name": "Genesis",
+                    "chapterCount": "50",
+                    "abbreviation": "Gen"
+                  },
+                  {
+                    "id": "02",
+                    "name": "Exodus",
+                    "chapterCount": "40",
+                    "abbreviation": "Ex"
+                  },
+                  {
+                    "id": "03",
+                    "name": "Leviticus",
+                    "chapterCount": "27",
+                    "abbreviation": "Lev"
+                  },
+                  {
+                    "id": "04",
+                    "name": "Numbers",
+                    "chapterCount": "36",
+                    "abbreviation": "Num"
+                  },
+                  {
+                    "id": "05",
+                    "name": "Deuteronomy",
+                    "chapterCount": "34",
+                    "abbreviation": "Deut"
+                  }
+                ]
+              },
+              {
+                "id": "02",
+                "name": "The Historical Books",
+                "books": [
+                  {
+                    "id": "06",
+                    "name": "Joshua",
+                    "chapterCount": "24",
+                    "abbreviation": "Josh"
+                  },
+                  {
+                    "id": "07",
+                    "name": "Judges",
+                    "chapterCount": "21",
+                    "abbreviation": "Judg"
+                  },
+                  {
+                    "id": "08",
+                    "name": "Ruth",
+                    "chapterCount": "4",
+                    "abbreviation": "Ruth"
+                  },
+                  {
+                    "id": "09",
+                    "name": "1-Samuel",
+                    "chapterCount": "31",
+                    "abbreviation": "1 Sam"
+                  },
+                  {
+                    "id": "10",
+                    "name": "2-Samuel",
+                    "chapterCount": "24",
+                    "abbreviation": "2 Sam"
+                  },
+                  {
+                    "id": "11",
+                    "name": "1-Kings",
+                    "chapterCount": "22",
+                    "abbreviation": "1 Kings"
+                  },
+                  {
+                    "id": "12",
+                    "name": "2-Kings",
+                    "chapterCount": "25",
+                    "abbreviation": "2 Kings"
+                  },
+                  {
+                    "id": "13",
+                    "name": "1-Chronicles",
+                    "chapterCount": "29",
+                    "abbreviation": "1 Chr"
+                  },
+                  {
+                    "id": "14",
+                    "name": "2-Chronicles",
+                    "chapterCount": "36",
+                    "abbreviation": "2 Chr"
+                  },
+                  {
+                    "id": "15",
+                    "name": "Ezra",
+                    "chapterCount": "10",
+                    "abbreviation": "Ezra"
+                  },
+                  {
+                    "id": "16",
+                    "name": "Nehmiah",
+                    "chapterCount": "13",
+                    "abbreviation": "Neh"
+                  },
+                  {
+                    "id": "17",
+                    "name": "Esther",
+                    "chapterCount": "10",
+                    "abbreviation": "Est"
+                  }
+                ]
+              },
+              {
+                "id": "03",
+                "name": "The Poetical Books",
+                "books": [
+                  {
+                    "id": "18",
+                    "name": "Job",
+                    "chapterCount": "42",
+                    "abbreviation": "Job"
+                  },
+                  {
+                    "id": "19",
+                    "name": "Psalms",
+                    "chapterCount": "150",
+                    "abbreviation": "Ps"
+                  },
+                  {
+                    "id": "20",
+                    "name": "Proverbs",
+                    "chapterCount": "31",
+                    "abbreviation": "Prov"
+                  },
+                  {
+                    "id": "21",
+                    "name": "Ecclesiastes",
+                    "chapterCount": "12",
+                    "abbreviation": "Eccl"
+                  },
+                  {
+                    "id": "22",
+                    "name": "Sos",
+                    "chapterCount": "8",
+                    "abbreviation": "Song"
+                  }
+                ]
+              },
+              {
+                "id": "04",
+                "name": "Major Prophets",
+                "books": [
+                  {
+                    "id": "23",
+                    "name": "Isiah",
+                    "chapterCount": "66",
+                    "abbreviation": "Isa"
+                  },
+                  {
+                    "id": "24",
+                    "name": "Jeremiah",
+                    "chapterCount": "52",
+                    "abbreviation": "Jer"
+                  },
+                  {
+                    "id": "25",
+                    "name": "Lamentations",
+                    "chapterCount": "5",
+                    "abbreviation": "Lam"
+                  },
+                  {
+                    "id": "26",
+                    "name": "Ezekiel",
+                    "chapterCount": "48",
+                    "abbreviation": "Ezek"
+                  },
+                  {
+                    "id": "27",
+                    "name": "Daniel",
+                    "chapterCount": "12",
+                    "abbreviation": "Dan"
+                  }
+                ]
+              },
+              {
+                "id": "05",
+                "name": "Minor Prophets",
+                "books": [
+                  {
+                    "id": "28",
+                    "name": "Hosea",
+                    "chapterCount": "14",
+                    "abbreviation": "Hos"
+                  },
+                  {
+                    "id": "29",
+                    "name": "Joel",
+                    "chapterCount": "3",
+                    "abbreviation": "Joel"
+                  },
+                  {
+                    "id": "30",
+                    "name": "Amos",
+                    "chapterCount": "9",
+                    "abbreviation": "Am"
+                  },
+                  {
+                    "id": "31",
+                    "name": "Obadiah",
+                    "chapterCount": "1",
+                    "abbreviation": "Ob"
+                  },
+                  {
+                    "id": "32",
+                    "name": "Jonah",
+                    "chapterCount": "4",
+                    "abbreviation": "Jon"
+                  },
+                  {
+                    "id": "33",
+                    "name": "Micah",
+                    "chapterCount": "7",
+                    "abbreviation": "Mic"
+                  },
+                  {
+                    "id": "34",
+                    "name": "Nahum",
+                    "chapterCount": "3",
+                    "abbreviation": "Nah"
+                  },
+                  {
+                    "id": "35",
+                    "name": "Habakuk",
+                    "chapterCount": "3",
+                    "abbreviation": "Hab"
+                  },
+                  {
+                    "id": "36",
+                    "name": "Zephaniah",
+                    "chapterCount": "3",
+                    "abbreviation": "Zeph"
+                  },
+                  {
+                    "id": "37",
+                    "name": "Haggai",
+                    "chapterCount": "2",
+                    "abbreviation": "Hag"
+                  },
+                  {
+                    "id": "38",
+                    "name": "Zechariah",
+                    "chapterCount": "14",
+                    "abbreviation": "Zech"
+                  },
+                  {
+                    "id": "39",
+                    "name": "Malachi",
+                    "chapterCount": "4",
+                    "abbreviation": "Mal"
+                  }
+                ]
+              }
+            ]
+          },
+
+          {
+            "id": "2",
+            "name": "New Testment",
+            "groups": [
+              {
+                "id": "06",
+                "name": "Gospels",
+                "books": [
+                  {
+                    "id": "40",
+                    "name": "Matthew",
+                    "chapterCount": "28",
+                    "abbreviation": "Mt"
+                  },
+                  {
+                    "id": "41",
+                    "name": "Mark",
+                    "chapterCount": "16",
+                    "abbreviation": "Mk"
+                  },
+                  {
+                    "id": "42",
+                    "name": "Luke",
+                    "chapterCount": "24",
+                    "abbreviation": "Lk"
+                  },
+                  {
+                    "id": "43",
+                    "name": "John",
+                    "chapterCount": "21",
+                    "abbreviation": "Jn"
+                  }
+                ]
+              },
+              {
+                "id": "07",
+                "name": "Acts",
+                "books": [
+                  {
+                    "id": "44",
+                    "name": "Acts",
+                    "chapterCount": "28",
+                    "abbreviation": "Acts"
+                  }
+                ]
+              },
+              {
+                "id": "08",
+                "name": "The Pauline Epistles",
+                "books": [
+                  {
+                    "id": "45",
+                    "name": "Romans",
+                    "chapterCount": "16",
+                    "abbreviation": "Rom"
+                  },
+                  {
+                    "id": "46",
+                    "name": "1-Corinthians",
+                    "chapterCount": "16",
+                    "abbreviation": "1 Cor"
+                  },
+                  {
+                    "id": "47",
+                    "name": "2-Corinthians",
+                    "chapterCount": "13",
+                    "abbreviation": "2 Cor"
+                  },
+                  {
+                    "id": "48",
+                    "name": "Galatians",
+                    "chapterCount": "6",
+                    "abbreviation": "Gal"
+                  },
+                  {
+                    "id": "49",
+                    "name": "Ephesians",
+                    "chapterCount": "6",
+                    "abbreviation": "Eph"
+                  },
+                  {
+                    "id": "50",
+                    "name": "Philipians",
+                    "chapterCount": "4",
+                    "abbreviation": "Phil"
+                  },
+                  {
+                    "id": "51",
+                    "name": "Colossians",
+                    "chapterCount": "4",
+                    "abbreviation": "Col"
+                  },
+                  {
+                    "id": "52",
+                    "name": "1-Thessalonians",
+                    "chapterCount": "5",
+                    "abbreviation": "1 Thess"
+                  },
+                  {
+                    "id": "53",
+                    "name": "2-Thessalonians",
+                    "chapterCount": "5",
+                    "abbreviation": "2 Thess"
+                  },
+                  {
+                    "id": "54",
+                    "name": "1-Timothy",
+                    "chapterCount": "6",
+                    "abbreviation": "1 Tim"
+                  },
+                  {
+                    "id": "55",
+                    "name": "2-Timothy",
+                    "chapterCount": "4",
+                    "abbreviation": "2 Tim"
+                  },
+                  {
+                    "id": "56",
+                    "name": "Titus",
+                    "chapterCount": "3",
+                    "abbreviation": "Titus"
+                  },
+                  {
+                    "id": "57",
+                    "name": "Phillemon",
+                    "chapterCount": "1",
+                    "abbreviation": "Philemon"
+                  },
+                  {
+                    "id": "58",
+                    "name": "Hebrews",
+                    "chapterCount": "13",
+                    "abbreviation": "Heb"
+                  }
+                ]
+              },
+              {
+                "id": "09",
+                "name": "The General Epistles",
+                "books": [
+                  {
+                    "id": "59",
+                    "name": "James",
+                    "chapterCount": "5",
+                    "abbreviation": "Jas"
+                  },
+                  {
+                    "id": "60",
+                    "name": "1-Peter",
+                    "chapterCount": "5",
+                    "abbreviation": "1 Pet"
+                  },
+                  {
+                    "id": "61",
+                    "name": "2-Peter",
+                    "chapterCount": "3",
+                    "abbreviation": "2 Pet"
+                  },
+                  {
+                    "id": "62",
+                    "name": "1-John",
+                    "chapterCount": "5",
+                    "abbreviation": "1 Jn"
+                  },
+                  {
+                    "id": "63",
+                    "name": "2-John",
+                    "chapterCount": "1",
+                    "abbreviation": "2 Jn"
+                  },
+                  {
+                    "id": "64",
+                    "name": "3-John",
+                    "chapterCount": "1",
+                    "abbreviation": "3 Jn"
+                  },
+                  {
+                    "id": "65",
+                    "name": "Jude",
+                    "chapterCount": "1",
+                    "abbreviation": "Jude"
+                  }
+                ]
+              },
+              {
+                "id": "10",
+                "name": "Revelation",
+                "books": [
+                  {
+                    "id": "66",
+                    "name": "Revelation",
+                    "chapterCount": "22",
+                    "abbreviation": "Rev"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+
+
+  ]
+}

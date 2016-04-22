@@ -1,0 +1,34 @@
+﻿
+<div style="background-color:powderblue">
+    <table>
+        <tr>
+            <td>
+                <button type="button" class="btn btn-default" ng-click="bible.setVersesRange('back')">
+                    <span class="glyphicon glyphicon-arrow-left icon-next" aria-hidden="true"></span>
+                </button>
+            </td>
+            <td style="width: 100%; text-align: center">{{bible.currentTitle()}}</td>
+            <td>
+                <button type="button" class="btn btn-default" ng-click="bible.setVersesRange('next')">
+                    <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
+                </button>
+            </td>
+        </tr>
+    </table>
+</div>
+
+
+<div ng-controller="controllerStyles as styleSettings">
+
+    <div ng-style="styleSettings.displayStyle()">
+        <table class="table table-condensed block">
+
+            <tr ng-repeat="verse in bible.displayVerses() ">
+                <td style="font-size: 12px;">{{verse.VerseNo}}.</td>
+                <td style="width: 100%;">{{verse.VerseText}}</td>
+            </tr>
+
+        </table>
+    </div>
+    <input class="navbar-fixed-bottom" style="max-width: 100%; width: 100%" type="range" min="12" max="64" ng-change="styleSettings.setFontSize()" ng-model="styleSettings.settings.fontSize" />
+</div>

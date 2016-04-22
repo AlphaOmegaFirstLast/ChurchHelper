@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{30BE4953-B9E9-4D4B-8932-DA4BBD4BA9BC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A6777442-53D0-4373-A6B6-9B2CDCD1FDF9}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+		NuGet.Config = NuGet.Config
+	EndProjectSection
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ChurchHelper", "src\ChurchHelper\ChurchHelper.xproj", "{7F676EEF-A739-4E72-985A-B21CA7D0C346}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7F676EEF-A739-4E72-985A-B21CA7D0C346}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F676EEF-A739-4E72-985A-B21CA7D0C346}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F676EEF-A739-4E72-985A-B21CA7D0C346}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F676EEF-A739-4E72-985A-B21CA7D0C346}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7F676EEF-A739-4E72-985A-B21CA7D0C346} = {30BE4953-B9E9-4D4B-8932-DA4BBD4BA9BC}
+	EndGlobalSection
+EndGlobal

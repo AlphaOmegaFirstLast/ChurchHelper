@@ -1,0 +1,55 @@
+﻿<div ng-controller="controllerSearch as search">
+    <table>
+        <tr>
+            <td style="vertical-align: top; width: 60%">
+
+                <button class="btn btn-primary btn-sm" ng-click="search.doSearch()">Search</button>
+
+                <div class="form-group form-inline">
+                    <label class="control-label">The result verses</label>
+                    <select class="form-control input-sm" style="width: auto" ng-model="search.selectedSearchOption" ng-options="op.caption for op in search.searchOptions" ng-init="search.selectedSearchOption = search.searchOptions[0]"/>
+                    <input type="text" class="form-control input-sm" placeholder="search" ng-model="search.searchTerm">
+                </div>
+
+                <table>
+                    <tr ng-repeat="verse in search.searchResult">
+                        <td> {{verse.BookId}} </td>
+                        <td> {{verse.ChapterId}} </td>
+                        <td> {{verse.VerseNo}} </td>
+                        <td style="width: 100%"> {{verse.VerseText}} </td>
+                    </tr>
+                </table>
+            </td>
+            <td style="width: auto">
+                <table class="text-sm">
+                    <tr>
+                        <td colspan="4" ng-click="search.clickBible()">
+                            <button type="button" class="btn btn-info btn-sm btn-block"> Bible </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" ng-repeat="testment in search.bibleStructure.Testments ">
+                            <button type="button" class="btn btn-info btn-sm btn-block" ng-click="search.clickTestment(testment)"> {{testment.Name}} </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td ng-repeat="groupColumn in bible.range(1,4,1)" style="vertical-align: top">
+                            <table>
+                                <tr ng-repeat="group in search.showGroup(groupColumn) ">
+                                    <td>
+                                        <button type="button" class="btn btn-info btn-sm btn-block" ng-click="search.clickGroup(group)">{{group.Name}} </button>
+                                        <div ng-repeat="book in group.Books">
+                                            <input type="checkbox" ng-model="book.boolSelected" ng-click="search.clickBook(book)"/> {{book.Name}}
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+
+            </td>
+        </tr>
+    </table>
+
+</div>

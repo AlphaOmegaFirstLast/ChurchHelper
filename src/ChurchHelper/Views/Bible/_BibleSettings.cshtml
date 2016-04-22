@@ -1,0 +1,41 @@
+﻿<div  ng-controller="controllerStyles as styleSettings">
+    
+    <button type="button" class="btn btn-info"  ng-click="styleSettings.clickSaveSettings">Save</button>
+    <table>
+        <tr>
+            <td>
+                Background Color
+            </td>
+            <td>
+                <input type="color"  ng-change="styleSettings.setBackgroundColor()" ng-model="styleSettings.settings.backgroundColor" ng-init="styleSettings.settings.backgroundColor" style="width: 85%;">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Font Color
+            </td>
+            <td>
+                <input type="color"  ng-change="styleSettings.setFontColor()" ng-model="styleSettings.settings.fontColor" style="width: 85%;">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Background Image
+            </td>
+            <td>
+                <input type="image" ng-model="styleSettings.settings.backgroundImage" style="width: 85%;">
+            </td>
+        </tr>
+        <tr>
+            <td>
+               Font Size
+            </td>
+            <td>
+                <input type="number" string-to-number min="12" max="64" ng-change="styleSettings.setFontSize()" ng-model="styleSettings.settings.fontSize"  />
+                
+            <input type="range"  min="12" max="64" ng-change="styleSettings.setFontSize()" ng-model="styleSettings.settings.fontSize" />
+            </td>
+        </tr>
+    </table>
+    
+</div>
