@@ -41,7 +41,7 @@ namespace ChurchHelper.Controllers
         [HttpPost]
         public async Task<ApiResponse<List<BibleVerse>>> DoSearch([FromBody]BibleSearch bibleSearch)
         {
-            return await _bibleManager.DoSearch(bibleSearch.BibleFilter, bibleSearch.SearchCriteria);
+            return await _bibleManager.DoSearch(bibleSearch);
         }
 
         [HttpGet]

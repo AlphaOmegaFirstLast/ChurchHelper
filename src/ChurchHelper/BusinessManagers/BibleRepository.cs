@@ -19,7 +19,7 @@ namespace ChurchHelper.BusinessManagers
         private readonly IOptions<List<Bible>> _bibleList;
         private readonly IRequestManager _requestManager;
         private string _readIndex = "http://localhost:9200/bibles/"; //  "http://localhost:9200/bible/";
-        private string _writeIndex = "http://localhost:9200/bibles/NKJV/";
+        private string _writeIndex = "http://localhost:9200/bibles/NKJV/";//VanDyke
 
         public BibleRepository(IOptions<List<Bible>> bibleList,IRequestManager requestClient)
         {
@@ -74,14 +74,6 @@ namespace ChurchHelper.BusinessManagers
             var response = new ApiResponse<List<BibleVerse>>();
 
             var query = string.Empty;
-            //query = query + "( ";
-            //query = query + " query: (bool: (";
-            //query = query + " must : [  ( term : ( 'translation': {0}) ), ( term : ( 'book': '{1}') ), ( term : ( 'chapter': '{2}') )]";
-            //query = query + ")) ";
-            //query = query + ", sort : [ 'translation' , 'book' , 'chapter' , 'number' ]";
-            //query = query + ", from : {3} " ;
-            //query = query + ", size : {4} " ;
-            //query = query + ")";
             query = query + "( ";
             query = query + " query: (bool: (";
             query = query + " must : [  ( term : ( 'BibleId': {0}) ), ( term : ( 'BookId': '{1}') ), ( term : ( 'ChapterId': '{2}') )]";
@@ -116,11 +108,20 @@ namespace ChurchHelper.BusinessManagers
             return response;
         }
 
-        public async Task<ApiResponse<List<BibleVerse>>> Query(Bible bibleFilter, SearchCriteria searchCriteria)
+        public async Task<ApiResponse<List<BibleVerse>>> Query(int pageIndex, List<int> bibleIds, Bible bibleFilter, SearchCriteria searchCriteria)
         {
             var response = new ApiResponse<List<BibleVerse>>();
-            var searchTerm = ArabicHelper.MapArabicToEnglishLetters(searchCriteria.SearchItems[0].SearchTerm) ;
-            var filterItems = GetFilter(bibleFilter);
+            var currentPage = pageIndex;
+            var recPerPage = 20;
+            var startIndex = recPerPage * (currentPage - 1) ;
+            var searchTerm = searchCriteria.SearchItems[0].SearchTerm;
+
+            if (bibleFilter.Language.Equals("arabic", StringComparison.OrdinalIgnoreCase))
+            {
+                searchTerm = ArabicHelper.MapArabicToEnglishLetters(searchCriteria.SearchItems[0].SearchTerm);
+            }
+
+            var filterItems = GetFilter(bibleIds , bibleFilter);
             var mustNotClause = string.Empty;
             var filter = string.Empty;
 
@@ -136,9 +137,9 @@ namespace ChurchHelper.BusinessManagers
             {
                 filter = $" , filter: ( or : [ {filterItems.Item1} ] ) ";
             }
-            var sort            =  $" , sort : [ 'BibleId' , 'BookId' , 'ChapterId' , 'VerseNo' ]"; 
-            var from            =  $" , from : 0 ";
-            var size            =  $" , size: 20 ";
+            var sort            =  $" , sort : ['BookId' , 'ChapterId' , 'VerseNo' ]"; 
+            var from            =  $" , from : {startIndex} ";
+            var size            =  $" , size : {recPerPage} ";
             var searchEnd       =  $" ) ";
 
             var boolQuery = $" {boolQueryStart} {mustClause} {mustNotClause} {boolQueryEnd}";
@@ -153,14 +154,17 @@ namespace ChurchHelper.BusinessManagers
             var esResponse = await _requestManager.ExecuteRequest<ElasticSearchResponse<ElasticSearchBibleDocument>, string>(endpoint, query);
             if (esResponse.Status.Ok)
             {
+                response.Pagination = new ApiPagination
+                {
+                    RecPerPage = recPerPage,
+                    CurrentPage = currentPage,
+                    TotalRecCount = esResponse.Data.hits.total,
+                    TotalPageCount = Convert.ToInt16(Math.Ceiling(Convert.ToDecimal(esResponse.Data.hits.total/recPerPage)))
+                };
+
                 response.Data = new List<BibleVerse>();
                 foreach (var hit in esResponse.Data.hits.hits)
                 {
-                    //var verse = new BibleVerse() {  BibleId = Convert.ToInt16(hit._source.translation)
-                    //                                , BookId = Convert.ToInt16(hit._source.book)
-                    //                                , ChapterId = Convert.ToInt16(hit._source.chapter)
-                    //                                , VerseNo = Convert.ToInt16(hit._source.number)
-                    //                                , VerseText = hit._source.arabicVerse };
                     var verse = new BibleVerse()
                     {
                         BibleId = Convert.ToInt16(hit._source.BibleId)
@@ -183,7 +187,7 @@ namespace ChurchHelper.BusinessManagers
             return response;
         }
 
-        private Tuple<string, string> GetFilter(Bible bibleFilter)
+        private Tuple<string, string> GetFilter(List<int> bibleIds, Bible bibleFilter)
         {
             var mustFilter = new StringBuilder();
             var mustNotFilter = new StringBuilder();
@@ -217,7 +221,7 @@ namespace ChurchHelper.BusinessManagers
                     case 1:
                         mustFilter.Append($" , ( term : ('TestmentId':'{testment.Id}') )");
                         break;
-                    default:
+                    default: //if selected = 2 which is partially selected
                         foreach (var group in testment.Groups)
                         {
                             switch (group.Selected)
@@ -246,6 +250,10 @@ namespace ChurchHelper.BusinessManagers
                         }
                         break;
                 }
+            }
+            foreach (var bibleId in bibleIds)
+            {
+                mustFilter.Append($" , ( term : ('BibleId':'{bibleId}') )");
             }
             var smustFilter = mustFilter.ToString();
             if (!string.IsNullOrEmpty(smustFilter))

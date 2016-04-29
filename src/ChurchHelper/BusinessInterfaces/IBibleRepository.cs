@@ -11,6 +11,6 @@ namespace ChurchHelper.BusinessInterfaces
         Task<ApiResponse<string>> UpdateDocument();
         Task<ApiResponse<string>> DeleteDocument();
         Task<ApiResponse<List<BibleVerse>>> GetDocuments(int bibleId, int bookId, int chapterId);
-        Task<ApiResponse<List<BibleVerse>>> Query(Bible bibleFilter, SearchCriteria searchCriteria);
+        Task<ApiResponse<List<BibleVerse>>> Query(int pageIndex, List<int> bibleIds, Bible bibleFilter, SearchCriteria searchCriteria);
     }
 }

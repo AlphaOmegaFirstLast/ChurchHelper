@@ -6,7 +6,8 @@
  {
         "id": 1,
         "name": "Van-Dyke",
-        "language": "name",
+        "language": "arabic",
+        "title": "الكتاب المقدس",
         "alignment": "right",
         "testments": [
           {
@@ -489,7 +490,8 @@
  {
         "id": 2,
         "name": "King James",
-        "language": "English",
+        "language": "english",
+        "title": "Bible",
         "alignment": "left",
         "testments": [
           {

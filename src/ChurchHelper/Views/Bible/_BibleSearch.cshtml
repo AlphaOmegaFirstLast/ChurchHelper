@@ -3,28 +3,42 @@
         <tr>
             <td style="vertical-align: top; width: 60%">
 
-                <button class="btn btn-primary btn-sm" ng-click="search.doSearch()">Search</button>
-
+                <button class="btn btn-info btn-sm" ng-click="search.doSearch(1)">Search</button> {{search.pagination.TotalRecCount}} found.
+                <nav>
+                    <ul class="pagination">
+                        <li>
+                            <a href="#" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <li ng-repeat="pageIndex in search.getPagination()"><a href="#" ng-click="search.doSearch(pageIndex)">{{pageIndex}}</a></li>
+                        <li>
+                            <a href="#" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
                 <div class="form-group form-inline">
                     <label class="control-label">The result verses</label>
                     <select class="form-control input-sm" style="width: auto" ng-model="search.selectedSearchOption" ng-options="op.caption for op in search.searchOptions" ng-init="search.selectedSearchOption = search.searchOptions[0]"/>
                     <input type="text" class="form-control input-sm" placeholder="search" ng-model="search.searchTerm">
                 </div>
 
-                <table>
+                <table class="table table-bordered table-striped">
                     <tr ng-repeat="verse in search.searchResult">
-                        <td> {{verse.BookId}} </td>
+                        <td> {{search.getBookName(verse.BookId)}} </td>
                         <td> {{verse.ChapterId}} </td>
                         <td> {{verse.VerseNo}} </td>
                         <td style="width: 100%"> {{verse.VerseText}} </td>
                     </tr>
                 </table>
             </td>
-            <td style="width: auto">
+            <td style="width: auto; vertical-align: top;">
                 <table class="text-sm">
                     <tr>
                         <td colspan="4" ng-click="search.clickBible()">
-                            <button type="button" class="btn btn-info btn-sm btn-block"> Bible </button>
+                            <button type="button" class="btn btn-info btn-sm btn-block"> {{search.bibleStructure.Title}} </button>
                         </td>
                     </tr>
                     <tr>

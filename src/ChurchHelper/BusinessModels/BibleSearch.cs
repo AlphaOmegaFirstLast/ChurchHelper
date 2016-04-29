@@ -7,6 +7,8 @@ namespace ChurchHelper.BusinessModels
 {
     public class BibleSearch
     {
+        public int PageIndex { get; set; }
+        public List<int> BibleIds { get; set; }
         public Bible BibleFilter { get; set; } 
         public SearchCriteria SearchCriteria { get; set; }
     }

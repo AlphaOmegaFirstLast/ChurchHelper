@@ -29,9 +29,9 @@ namespace ChurchHelper.BusinessManagers
             var response = await _bibleRepository.GetDocuments(bibleId, bookId, chapterId);
             return response;
         }
-        public async Task<ApiResponse<List<BibleVerse>>> DoSearch(Bible bibleFilter, SearchCriteria searchCriteria)
+        public async Task<ApiResponse<List<BibleVerse>>> DoSearch(BibleSearch bibleSearch)
         {
-            var response = await _bibleRepository.Query(bibleFilter, searchCriteria);
+            var response = await _bibleRepository.Query(bibleSearch.PageIndex, bibleSearch.BibleIds, bibleSearch.BibleFilter, bibleSearch.SearchCriteria);
             return response;
         }
 

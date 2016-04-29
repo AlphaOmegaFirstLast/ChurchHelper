@@ -1,15 +1,15 @@
 ﻿
-<div style="background-color:powderblue">
+<div style="background-color:powderblue"  ng-controller="controllerDisplay as ctrlDisplay">
     <table>
         <tr>
             <td>
-                <button type="button" class="btn btn-default" ng-click="bible.setVersesRange('back')">
+                <button type="button" class="btn btn-default" ng-click="bible.setDisplayRange('back')">
                     <span class="glyphicon glyphicon-arrow-left icon-next" aria-hidden="true"></span>
                 </button>
             </td>
             <td style="width: 100%; text-align: center">{{bible.currentTitle()}}</td>
             <td>
-                <button type="button" class="btn btn-default" ng-click="bible.setVersesRange('next')">
+                <button type="button" class="btn btn-default" ng-click="ctrlDisplay.setDisplayRange('next')">
                     <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
                 </button>
             </td>
@@ -19,11 +19,10 @@
 
 
 <div ng-controller="controllerStyles as styleSettings">
-
     <div ng-style="styleSettings.displayStyle()">
         <table class="table table-condensed block">
 
-            <tr ng-repeat="verse in bible.displayVerses() ">
+            <tr ng-repeat="verse in ctrlDisplay.getDisplayItems() ">
                 <td style="font-size: 12px;">{{verse.VerseNo}}.</td>
                 <td style="width: 100%;">{{verse.VerseText}}</td>
             </tr>

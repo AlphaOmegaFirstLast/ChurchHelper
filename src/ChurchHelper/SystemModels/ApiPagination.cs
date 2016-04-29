@@ -9,7 +9,8 @@ namespace ChurchHelper.SystemModels
     {
         public int TotalRecCount { get; set; }
         public int TotalPageCount { get; set; }
-        public string CurrentPage { get; set; }
+        public int CurrentPage { get; set; }
+        public int RecPerPage { get; set; }
 
     }
 }
