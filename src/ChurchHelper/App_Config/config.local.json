@@ -1,0 +1,7 @@
+﻿{
+   "Config": {
+    "ElasticSearchReadIndex": "http://localhost:9200/bibles/",
+    "ElasticSearchWriteIndex": "http://localhost:9200/bibles/VanDyke/",
+    "ApiPath": "http://localhost:54379/apiBible/"
+  }
+}

@@ -1,33 +1,37 @@
-﻿
-<div style="background-color:powderblue"  ng-controller="controllerDisplay as ctrlDisplay">
-    <table>
-        <tr>
-            <td>
-                <button type="button" class="btn btn-default" ng-click="bible.setDisplayRange('back')">
-                    <span class="glyphicon glyphicon-arrow-left icon-next" aria-hidden="true"></span>
-                </button>
-            </td>
-            <td style="width: 100%; text-align: center">{{bible.currentTitle()}}</td>
-            <td>
-                <button type="button" class="btn btn-default" ng-click="ctrlDisplay.setDisplayRange('next')">
-                    <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
-                </button>
-            </td>
-        </tr>
-    </table>
-</div>
+﻿<div ng-controller="controllerDisplay as ngDisplay">
 
 
-<div ng-controller="controllerStyles as styleSettings">
-    <div ng-style="styleSettings.displayStyle()">
-        <table class="table table-condensed block">
-
-            <tr ng-repeat="verse in ctrlDisplay.getDisplayItems() ">
-                <td style="font-size: 12px;">{{verse.VerseNo}}.</td>
-                <td style="width: 100%;">{{verse.VerseText}}</td>
+    <div class="title-bar">
+        <table>
+            <tr>
+                <td>
+                    <button type="button" class="btn btn-default" ng-click="ngDisplay.setDisplayRange('back')">
+                        <span class="glyphicon glyphicon-arrow-left icon-next" aria-hidden="true"></span>
+                    </button>
+                </td>
+                <td style="width: 100%; text-align: center">{{ngDisplay.currentTitle()}}</td>
+                <td>
+                    <button type="button" class="btn btn-default" ng-click="ngDisplay.setDisplayRange('next')">
+                        <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
+                    </button>
+                </td>
             </tr>
-
         </table>
     </div>
-    <input class="navbar-fixed-bottom" style="max-width: 100%; width: 100%" type="range" min="12" max="64" ng-change="styleSettings.setFontSize()" ng-model="styleSettings.settings.fontSize" />
+
+
+    <div ng-controller="controllerStyles as ngStyles">
+        <div ng-style="ngStyles.displayStyle()">
+            <table class="table table-condensed block">
+
+                <tr ng-repeat="item in ngDisplay.selectedDisplay">
+                    <td style="font-size: 12px;">{{item.label}}.</td>
+                    <td style="width: 100%;">{{item.text}}</td>
+                </tr>
+
+            </table>
+        </div>
+        <input class="navbar-fixed-bottom" style="max-width: 100%; width: 100%" type="range" min="12" max="64" ng-change="ngStyles.setFontSize()" ng-model="ngStyles.settings.fontSize" />
+    </div>
+
 </div>

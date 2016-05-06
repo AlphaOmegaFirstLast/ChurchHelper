@@ -10,7 +10,7 @@ namespace ChurchHelper.BusinessInterfaces
         Task<ApiResponse<List<BibleVerse>>> GetVersesOfChapter(int bibleId, int bookId, int chapterId);
         Task<ApiResponse<List<BibleVerse>>> DoSearch(BibleSearch bibleSearch);
         Task<ApiResponse<string>> ReindexVanDyke();
-        Task<ApiResponse<string>> ReindexKJV();
+        Task<ApiResponse<string>> ReindexNKJV();
         Task<ApiResponse<List<dynamic>>> VerifyReindex();
     }
 }

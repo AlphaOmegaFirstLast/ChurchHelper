@@ -1,26 +1,22 @@
 ﻿@{
     ViewData["Title"] = "Bible Title";
 }
-<body ng-app="appBibleContents" ng-controller="controllerBibleContents as bible">
+<body ng-app="appBibleContents">
     <div class="navbar navbar-fixed-top" ng-controller="controllerBibleSettings as bibleSettings">
-        <div class="container" style="background-color:#add8e6">
-            <div class="navbar-header">
-            </div>
+        <div class="container menu-bar">
 
             <ul id="menuTabs" class="nav nav-tabs" role="tablist">
                 <li><a asp-controller="Home" asp-action="Index">ChurchHelper</a></li>
                 <li><a role="tab" data-toggle="tab" href="#divContent" aria-controls="content">Contents</a></li>
                 <li><a role="tab" data-toggle="tab" href="#divDisplay" aria-controls="display">Display</a></li>
                 <li><a role="tab" data-toggle="tab" href="#divSearch" aria-controls="search">Search</a></li>
+                <li><a role="tab" data-toggle="tab" href="#divService" aria-controls="service">Service</a></li>
                 <li><a role="tab" data-toggle="tab" href="#divSettings" aria-controls="settings">Settings</a></li>
 
-                <li style="float: right">
-                    <button type="button" class="glyphicon glyphicon-off" onclick=" dvMessage.innerHTML='' ;"></button>
+                <li style="float: right; margin-top: 3px;">
+                        <input class="form-control" style="width: 70px;" type="number" min="1" max="10" ng-change="bibleSettings.setVersesPerPage()" ng-model="bibleSettings.settings.versesPerPage" ng-init="bibleSettings.settings.versesPerPage" />                       
                 </li>
-                <li style="float: right">
-                    <input class="form-control" style="width: 70px" type="number" min="1" max="10" ng-click="bibleSettings.setVersesPerPage()" ng-model="bibleSettings.settings.versesPerPage" ng-init="bibleSettings.settings.versesPerPage"  />
-                </li>
-                <li style="float: right">
+                <li style="float: right; margin-top: 3px;">
                     <select class="form-control" ng-model="selectedItem" ng-change="bibleSettings.setBibleId(selectedItem)" ng-init="selectedItem='1'">
                         <option ng-repeat="item in bibleSettings.bibles" value="{{item.id}}">{{item.name}}</option>
                     </select>
@@ -29,7 +25,8 @@
         </div>
     </div>
 
-    <div id="dvMessage" class="text-danger"> </div>
+    <div id="dvMessage" class="text-danger"> </div><button type="button" id="btnClearMessage" class="glyphicon glyphicon-off" style="display: none;" onclick=" dvMessage.innerHTML='' ; btnClearMessage.style.display='none';"></button>
+
     <div class="tab-content" id="divPanels" role="tablist" aria-multiselectable="true">
         <div id="divContent" class="tab-pane active" role="tabpanel">
             @Html.Partial("~/Views/Bible/_BibleContent")
@@ -39,6 +36,9 @@
         </div>
         <div id="divSearch" class="tab-pane" role="tabpanel">
             @Html.Partial("~/Views/Bible/_BibleSearch")
+        </div>
+        <div id="divService" class="tab-pane" role="tabpanel">
+            @Html.Partial("~/Views/Bible/_BibleService")
         </div>
         <div id="divSettings" class="tab-pane" role="tabpanel">
             @Html.Partial("~/Views/Bible/_BibleSettings")

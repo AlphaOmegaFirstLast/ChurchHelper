@@ -4,7 +4,7 @@ function globalErrorHandler(msg, url, line, col, error) {
     var extra = !col ? '' : '\ncolumn: ' + col + !error ? '' : '\nerror: ' + error;
 
     $('#dvMessage').text("javascript error: " + msg + "\nurl: " + url + "\nline: " + line + extra);
-
+    $('#btnClearMessage').show();
     // TODO: Report this error via ajax so you can keep track of js issues
 
     var suppressErrorAlert = true;

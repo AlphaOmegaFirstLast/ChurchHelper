@@ -17,72 +17,85 @@ app.run(["serviceApiCalls", "$rootScope", function (serviceApiCalls, $rootScope)
 app.factory('$exceptionHandler', function() {
     return function(exception, cause) {
         $('#dvMessage').html ( "Angular error: " + decodeURI(exception.message) + " :" + cause + "<br/>" + exception.fileName.substring(exception.fileName.lastIndexOf('/')) + " :" + exception.lineNumber );
+        $('#btnClearMessage').show();
     }
 });
 /*---------------------------------------------------------------------------------------------------------
                                             Service Display
 --------------------------------------------------------------------------------------------------------- */
-
 app.service('serviceDisplay', function () {
     var me = this;
-    this.publish = [];
-    this.arDisplay = [];
-    this.goDisplay = false;
+    this.publish = [];                                      // array of subscribers
+    this.arDisplayData = [];                                // array of data to display  
+    this.currentIndex = 1;
+    this.titlePrefix = "";
 
-    this.registerSubscriber = function (callback) {
+    this.registerSubscriber = function (callback) {         //build publish array
         me.publish.push(callback);
     };
 
-    this.setDisplay = function (inputDisplay) {
-        me.arDisplay = inputDisplay;
+    this.setDisplayData = function (data , index , titlePrefix) {
+        me.currentIndex = index;                           // when bible, book or chapter changes
+        me.titlePrefix = titlePrefix;
+        me.arDisplayData = data;
         me.publish.forEach(function (p) {
-            p();
+            p("dataChange");
         });
     }
 
-    this.startDisplay = function () {
-        me.goDisplay = true;
-        me.publish.forEach(function (p) {  // fir a signal to dstart display
-            p();
+    this.startDisplay = function (index) {
+        me.currentIndex = index;
+        me.publish.forEach(function (p) {                 // when user clicks a certain index to go display, fire a signal to start display
+            p("switchTab");
         });
-        me.goDisplay = false;
     }
 
 });
 /*---------------------------------------------------------------------------------------------------------
                                             conrtoller Display
 --------------------------------------------------------------------------------------------------------- */
-
 app.controller('controllerDisplay', ["serviceDisplay", "serviceBibleSettings", function (serviceDisplay, serviceSettings) {
     var me = this;
     this.publish = [];
-    this.arDisplay = [];
+    this.arDisplayData = [];
+    this.selectedDisplay = [];
+    this.titlePrefix = "";
     this.step = 2;
+    this.currentIndex = 1;
     this.fromIndex = 1;
     this.toIndex = this.fromIndex + this.step;
-    this.currentIndex = 1;
 
     // init ---------------------------------------------------------------------
-    this.init = function() {
-        serviceDisplay.registerSubscriber(me.updateSubscriber); 
-        serviceBibleSettings.registerSubscriber(me.updateSubscriber);  // when bible translation changes, let us know
+    this.init = function () {                                             // serviceS will notify controllerDisplay if data, currentIndex or step have changed.
+        serviceDisplay.registerSubscriber(me.updateDisplaySubscriber); 
+        serviceSettings.registerSubscriber(me.updateSettingsSubscriber);  // when bible translation changes, let us know
     }
     //---------------------------------------------------------------------------
-    this.updateSubscriber = function() {           // services will notify controllerDisplay if data or step have changed.
-        me.arDisplay = serviceDisplay.arDisplay;
-        var newStep = serviceSettings.settings.versesPerPage;
-
-        if (me.step != newStep) {
-            me.step = parseInt(newStep);
+    this.updateDisplaySubscriber = function (msg) {
+        if (msg != null && msg == "dataChange") {
+            me.arDisplayData = serviceDisplay.arDisplayData;                     //update from serviceDisplay
+            me.currentIndex = serviceDisplay.currentIndex;
+            me.titlePrefix = serviceDisplay.titlePrefix;
+            me.setDisplayRange('start', me.currentIndex);
         }
 
-        me.setDisplayRange('start', me.currentIndex);
-
-        if (serviceDisplay.goDisplay) {
-            $('#menuTabs a[href= "#divDisplay"]').tab("show");  // switch to display tab
+        if (msg !=null && msg == "switchTab") {
+            me.currentIndex = serviceDisplay.currentIndex;;
+            me.setDisplayRange('start', me.currentIndex);
+            $('#menuTabs a[href= "#divDisplay"]').tab("show");          // switch to display tab
         }
 
     };
+
+    this.updateSettingsSubscriber = function () {           
+        var newStep = serviceSettings.settings.versesPerPage;       //update from serviceSettings  
+
+        if (me.step != newStep) {
+            me.step = parseInt(newStep);
+            me.setDisplayRange('start', me.currentIndex);
+        }
+    };
+
     this.setStartDisplay = function (index) {
         me.currentIndex = index;                    // in this case verse number = verse index
         me.setDisplayRange('start', me.currentIndex);
@@ -90,7 +103,7 @@ app.controller('controllerDisplay', ["serviceDisplay", "serviceBibleSettings", f
 
     this.setDisplayRange = function (operation, startIndex) {  // operation : start | next | back
         var minIndex = 1;
-        var maxIndex = me.arDisplay.length;
+        var maxIndex = me.arDisplayData.length;
         var myCurrentIndex = startIndex ? parseInt(startIndex) : minIndex;  // if startIndex==null then take minVerse
 
         if (operation == 'next') {
@@ -107,23 +120,33 @@ app.controller('controllerDisplay', ["serviceDisplay", "serviceBibleSettings", f
         me.toIndex = myCurrentIndex + me.step - 1;
 
         if (me.toIndex > maxIndex) me.toIndex = maxIndex;
-    }
-
-    this.getDisplayItems = function () {
-        var selectedDisplay = [];
+        // --------------- display items ------------------------
+        me.selectedDisplay = [];
         for (var i = me.fromIndex - 1; i <= me.toIndex - 1; i++) {
-            selectedDisplay.push(me.arDisplay[i]);
+            me.selectedDisplay.push(me.arDisplayData[i]);
         }
-        return selectedDisplay;
+
     }
 
+    this.currentTitle = function () {
+        if (me.fromIndex == me.toIndex) {
+            return me.titlePrefix + " : " + me.fromIndex;
+        } else {
+            return me.titlePrefix + " : " + me.fromIndex + " - " + me.toIndex;
+        }
+    }
+
+    //----------------------------------------------------------------------------
+    this.init();
 }]);
 /*---------------------------------------------------------------------------------------------------------
                                             Service Api Call
 --------------------------------------------------------------------------------------------------------- */
 app.service('serviceApiCalls', ['$http', '$rootScope', function ($http, $rootScope) {
-    var apiPath = "http://localhost:54379/apiBible/"; // "http://churchhelper.azurewebsites.net/apiBible/";  
+    var apiPath = "http://localhost:54379/apiBible/";  // "http://churchhelper.azurewebsites.net/apiBible/"; 
     //--------------------------------------------------------------------------------------
+    var me = this;
+
     this.getBibleStructure = function () {  // get bible structure in 2 lang once at the begining of the angular app
 
         $http.get(apiPath + "GetBibleStructure")
@@ -134,7 +157,7 @@ app.service('serviceApiCalls', ['$http', '$rootScope', function ($http, $rootSco
                     $rootScope.bibleStructures = apiResponse.Data;  //intended to be 2 bible structures each in a different language
                     $rootScope.bibleStructures.unshift(apiResponse.Data[0]); //add an extra bible at the position of 0 as default and to make switch between bible versions easier
                 } else {
-                    $("#dvMessage").text("api Failure: " + apiResponse.Status.Id + " : " + apiResponse.Status.Info);
+                    me.failureApiCall(apiResponse);
                 }
             }
             , this.failureHttpRequest);
@@ -149,7 +172,7 @@ app.service('serviceApiCalls', ['$http', '$rootScope', function ($http, $rootSco
                 if (apiResponse.Status.Ok) {
                     callBack(apiResponse.Data);
                 } else {
-                    $("#dvMessage").text("api Failure: " + apiResponse.Status.Id + " : " + apiResponse.Status.Info);
+                    me.failureApiCall(apiResponse);
                 }
             }
             , this.failureHttpRequest);
@@ -164,7 +187,7 @@ app.service('serviceApiCalls', ['$http', '$rootScope', function ($http, $rootSco
                 if (apiResponse.Status.Ok) {
                     callBack(apiResponse.Data, apiResponse.Pagination);
                 } else {
-                    $("#dvMessage").text("api Failure: " + apiResponse.Status.Id + " : " + apiResponse.Status.Info);
+                    me.failureApiCall(apiResponse);
                 }
             }
             , this.failureHttpRequest);
@@ -172,6 +195,11 @@ app.service('serviceApiCalls', ['$http', '$rootScope', function ($http, $rootSco
     //--------------------------------------------------------------------------------------
     this.failureHttpRequest = function (response) {
         $("#dvMessage").text("http Failure: " + response.status + " : " + response.statusText);
+        $('#btnClearMessage').show();
+    };
+    this.failureApiCall = function (apiResponse) {
+        $("#dvMessage").text("api Failure: " + apiResponse.Status.Id + " : " + apiResponse.Status.Info);
+        $('#btnClearMessage').show();
     };
     //--------------------------------------------------------------------------------------
 
@@ -186,8 +214,7 @@ app.controller('controllerBibleContents', ["serviceApiCalls", "serviceBibleSetti
     this.chapters = [];
     this.verses = [];
 
-    me.current = { bibleId: 0, book: { Id: "", Name: "", ChapterCount: 1 }, chapter: 1, verse: 1, fromVerse: 1, toVerse: 1 };
-    me.step = 1;
+    me.current = { bibleId: 0 , book: { Id:0 , Name: "", ChapterCount: 1 }, chapter: 1, verse: 1, fromVerse: 1, toVerse: 1 };
     var watchStructure = null;
 
     // init ---------------------------------------------------------------------------------------------------
@@ -201,17 +228,29 @@ app.controller('controllerBibleContents', ["serviceApiCalls", "serviceBibleSetti
         }, function () {
             if ($rootScope.bibleStructures != null) {
                 me.getBibleStructure($rootScope.bibleStructures[0]);    //fill the controller objects with data from $rootScope
-    //            me.setVersesRange('start', 1);                          // fill me.verses for display
+                me.setBook(me.books[0], false);
                 watchStructure();                                       //after getting structure then clear watch - so code is not re-called
             }
         }, true);
 
     };
-
     //----------------------------------------------------------------------------------------------------------
+    this.updateSubscriber = function () {       // subscribe to the service so it notifies us with any updates to the bible settings
+        var newBiblId = serviceSettings.settings.bibleId;
+
+        if (me.current.bibleId != newBiblId) {
+            me.current.bibleId = newBiblId ;
+            if ($rootScope.bibleStructures != null && $rootScope.bibleStructures[me.current.bibleId] != null) {
+                me.getBibleStructure($rootScope.bibleStructures[me.current.bibleId]);
+                me.setBook(me.current.book, true);
+            }
+        }
+    }
+    // display contents Events --------------------------------------------------------------------------------
+
     this.getBibleStructure = function (data) {
         me.bibleStructure = data;
-
+        me.current.bibleId = me.bibleStructure.Id;
         this.books = [];
         me.bibleStructure.Testments.forEach(function (testment) {
             testment.Groups.forEach(function (group) {
@@ -221,124 +260,73 @@ app.controller('controllerBibleContents', ["serviceApiCalls", "serviceBibleSetti
                 });
             });
         });
-        me.clickBook(me.books[0]);
     };
 
-    this.updateSubscriber = function () {       // subscribe to the service so it notifies us with any updates to the bible settings
-        var newBiblId = serviceSettings.settings.bibleId;
-        var newStep = serviceSettings.settings.versesPerPage;
+    this.getBookById = function (bookId) {
+        var matchedBook = {};
+        me.books.forEach(function(book) {
+                if (book.Id == bookId) {
+                    matchedBook =  book;
+                }
+            });
+        return matchedBook;
+    };
 
-        if (me.current.bibleId.Id != newBiblId) {
-            me.current.bibleId = newBiblId ;
-            if ($rootScope.bibleStructures != null && $rootScope.bibleStructures[me.current.bibleId] != null) {
-                me.getBibleStructure($rootScope.bibleStructures[me.current.bibleId]);
-                me.clickChapter(me.current.chapter, me.current.verse);
-            }
-        }
-
-        //if (me.step != newStep) {
-        //    me.step = parseInt(newStep);
-        //    me.setVersesRange('start', me.current.verse);
-        //}
+    this.clickBook = function (book) {       //user event
+        me.setBook(book , false);
     }
-        // display contents Events --------------------------------------------------------------------------------
 
-    this.currentTitle = function () {
-        if (me.current.fromVerse == me.current.toVerse) {
-            return me.current.book.Name + " " + me.current.chapter + " : " + me.current.verse;
+    this.setBook = function (book , bibleChanged ) {
+        if (!bibleChanged) {
+            if (me.current.book.Id != book.Id) {
+                me.current.book = book;
+                me.chapters = [];
+                for (var i = 1; i <= book.ChapterCount; i++) {
+                    me.chapters.push(i);
+                }
+                me.setChapter(me.chapters[0], 1);
+            }
         } else {
-            return me.current.book.Name + " " + me.current.chapter + " : " + me.current.fromVerse + " - " + me.current.toVerse;
+            me.current.book = me.getBookById(book.Id);  // same id different name in different language
+            me.setChapter(me.current.chapter, me.current.verse);
         }
     }
 
-    this.clickBook = function (book) {
-        if (me.current.book.Id != book.Id) {
-            me.current.book = book;
-            me.current.chapter = 1;
-            me.chapters = [];
-            for (var i = 1; i <= book.ChapterCount; i++) {
-                me.chapters.push(i);
-            }
-            me.clickChapter(me.chapters[0]);
-        }
+    this.clickChapter = function (chapter) {   //user event
+        me.setChapter(chapter, 1);
     }
 
-    this.clickChapter = function (chapter, verse) {
+    this.setChapter = function (chapter , verseIndex) {
         me.current.chapter = chapter;
-        if (verse == null) {
-            me.current.verse = 1;
-        } else {
-            me.current.verse = verse;
-        }
+        me.current.verse = verseIndex;
         serviceApiCalls.getVerseOfChapter(me.current.bibleId, me.current.book.Id, me.current.chapter, me.getVersesOfChapter);
     }
 
-    this.clickVerse = function (verse) {
-        serviceDisplay.startDisplay(verse.VerseNo);
+    this.clickVerse = function (verse)
+    {
+        me.current.verse = verse.VerseNo;
+        serviceDisplay.startDisplay(me.current.verse);
     }
 
     this.getVersesOfChapter = function (data) {
         me.verses = data;
-        serviceDisplay.setDisplay(data);
-
-    //    me.setVersesRange('start', me.current.verse);
+        var arDisplay = [];
+        me.verses.forEach(function (resultVerse) {
+            arDisplay.push({ label: resultVerse.VerseNo, text: resultVerse.VerseText });
+        });
+        serviceDisplay.setDisplayData(arDisplay, me.current.verse, me.currentTitle());
     };
 
-
-
-    //this.clickVerse = function (verse) {
-    //    me.current.verse = verse.VerseNo;                    // in this case verse number = verse index
-    //    $('#menuTabs a[href= "#divDisplay"]').tab("show");  // switch to display tab
-    //    me.setVersesRange('start', me.current.verse);
-    //}
-
-    //this.clickVersesPerPage = function() {
-    //    me.setVersesRange('start', me.current.verse);
-    //}
-
-    //this.setVersesRange = function (operation, startVerse) {  // operation : start | next | back
-    //    var minVerse = 1;
-    //    var maxVerse = me.verses.length;
-    //    var myCurrentVerse = startVerse ? parseInt(startVerse) : minVerse;  // if startVerse==null then take minVerse
-
-    //    if (operation == 'next') {
-    //        myCurrentVerse = me.current.verse + me.step;
-    //    }
-    //    if (operation == 'back') {
-    //        myCurrentVerse = me.current.verse - me.step;
-    //    }
-    //    myCurrentVerse = myCurrentVerse < minVerse ? minVerse : myCurrentVerse;
-    //    myCurrentVerse = myCurrentVerse > maxVerse ? maxVerse : myCurrentVerse;
-
-    //    me.current.verse = myCurrentVerse;
-    //    me.current.fromVerse = myCurrentVerse;
-    //    me.current.toVerse = myCurrentVerse + me.step - 1;
-
-    //    if (me.current.toVerse > maxVerse) me.current.toVerse = maxVerse;
-    //}
-
-    //this.displayVerses = function () {
-    //    var selectedVerses = [];
-    //    for (var i = me.current.fromVerse - 1; i <= me.current.toVerse - 1; i++) {
-    //        selectedVerses.push(me.verses[i]);
-    //    }
-    //    return selectedVerses;
-    //}
-
-    // General -------------------------------------------------------------------------------------
-
-    this.cloneObject = function (obj) {
-        var cloneOfObj = JSON.parse(JSON.stringify(obj));  //clone properties not methods
-        return cloneOfObj;
+    this.currentTitle = function () {
+        var title = me.current.book.Name + " " + me.current.chapter;
+        return title;
     }
 
-    this.range= function(min, max, step) {
-        var arInt = [];
-        for (var i = min; i <= max ;  i+= step)
-            arInt.push(i);
-        return arInt;
-    }
-
+    $scope.$on('goContext', function(event, obj) {
+        me.current.book = me.getBookById(obj.bookId);  // same id different name in different language
+        me.setChapter(obj.chapterId, obj.verseNo);
+        serviceDisplay.startDisplay(me.current.verse);
+    });
     //----------------------------------------------------------------------------------------------
 
     this.init();
@@ -347,7 +335,7 @@ app.controller('controllerBibleContents', ["serviceApiCalls", "serviceBibleSetti
 /*---------------------------------------------------------------------------------------------------------
                                             controller Search
 --------------------------------------------------------------------------------------------------------- */
-app.controller('controllerSearch', ["serviceApiCalls", "serviceBibleSettings", "$rootScope", "$scope", function (serviceApiCalls, serviceSettings, $rootScope, $scope) {
+app.controller('controllerSearch', ["serviceApiCalls", "serviceBibleSettings", "serviceDisplay", "$rootScope", "$scope", function (serviceApiCalls, serviceSettings, serviceDisplay, $rootScope, $scope) {
 
     var me = this;
     this.bibleStructure = {};
@@ -468,10 +456,30 @@ app.controller('controllerSearch', ["serviceApiCalls", "serviceBibleSettings", "
         }
     }
 
-    this.successDoSearch = function (data , pagination) {
+    this.successDoSearch = function (data, pagination) {
         me.searchResult = data;
         me.pagination = pagination;
+        var arDisplay = [];
+        me.searchResult.forEach(function (resultVerse) {
+            arDisplay.push({ label: me.getBookName(resultVerse.BookId) + " " + resultVerse.ChapterId + " : " + resultVerse.VerseNo, text: resultVerse.VerseText });
+        });
+        serviceDisplay.setDisplayData(arDisplay, 1, "Result Page : " + me.pagination.CurrentPage);
     };
+
+    this.startDisplay = function (index) {
+        serviceDisplay.startDisplay(index);
+    };
+
+    this.goContext = function (bookId, chapterId, verseNo) {
+        $rootScope.$broadcast('goContext', { bookId: bookId, chapterId: chapterId, verseNo: verseNo });   //raise event to controllerBibleContent to handle (will make it to listen)
+    };
+
+    this.getTranslations = function (bibleId, bookId, chapterId, verseNo) {
+        alert("getTranslations: " + bibleId + bookId + chapterId + verseNo);
+    }
+    this.sendToService = function (bibleId, bookId, chapterId, verseNo) {
+        alert("sendToService: " + bibleId + bookId + chapterId + verseNo);
+    }
 
     this.getPagination = function () {
         var arPages = [];
@@ -553,6 +561,7 @@ app.service('serviceStyleSettings', ['serviceBibleSettings' , function (serviceB
         me.publish.forEach(function (p) {
             p();
         });
+        this.setCssClass(me.settings.fontColor, me.settings.backgroundColor);
     }
 
     this.setFontColor = function (fontColor) {
@@ -560,6 +569,7 @@ app.service('serviceStyleSettings', ['serviceBibleSettings' , function (serviceB
         me.publish.forEach(function (p) {
             p();
         });
+        this.setCssClass(me.settings.fontColor, me.settings.backgroundColor);
     }
 
     this.displayStyle = function () {
@@ -572,6 +582,93 @@ app.service('serviceStyleSettings', ['serviceBibleSettings' , function (serviceB
         return style;
     }
 
+    this.rgbToHsl = function(r, g, b) {
+        r /= 255, g /= 255, b /= 255;
+        var max = Math.max(r, g, b), min = Math.min(r, g, b);
+        var h, s, l = (max + min) / 2;
+
+        if (max == min) {
+            h = s = 0;
+        } else {
+            var d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+            switch (max) {
+            case r:
+                h = (g - b) / (max - min);
+                break;
+            case g:
+                h = 2.0 + (b - r) / (max - min);
+                break;
+            case b:
+                h = 4.0 + (r - g) / (max - min);
+                break;
+            }
+
+            h = h * 0.6 ;
+        }
+        h = (h * 100 + 0.5) | 0;
+        s = ((s * 100 + 0.5) | 0);
+        l = ((l * 100 + 0.5) | 0);
+        return {h:h, s:s, l:l};
+    };
+
+    this.setCssClass = function (frontColor , backgroundColor) {
+        var rgb = [];
+        var hex = (backgroundColor+'').replace(/#/, '');
+
+        for (var i = 0; i < 6; i += 2) {
+            rgb.push(parseInt(hex.substr(i, 2), 16));
+        }
+        var hsl = this.rgbToHsl(rgb[0], rgb[1], rgb[2]);
+        //--------------------------------------------
+        var turningPoint = hsl.l > 50 ? -1 : +1;
+        var bkGround     = hsl.l > 50 ? (hsl.l + "%") : " 95%";
+        var bkGroundEnds = hsl.l > 50 ? " 95%" : (hsl.l + "%");
+        //--------------------------------------------
+        var $style = $("<style type='text/css'>").appendTo('head');
+        var menuBkColorEnd = "hsl(" + hsl.h + ", 50% ," + bkGroundEnds + ")";                    // menu ends have lighter than base color to form the gradient
+        var menuBkColor = "hsl(" + hsl.h + ", 50% ," + bkGround + ")";          // menu has a less staurated color than the base color
+        var titleBarBkColor     = "hsl(" + hsl.h + ", 50% ," + (hsl.l + (turningPoint * 10)) + "%)";
+        var stripedOddColor = "hsl(" + hsl.h + ", 50% ," + bkGround + ")";
+        var stripedEvenColor    = "hsl(" + hsl.h + ", 50% ," + (hsl.l + (turningPoint * 10)) + "%)";
+        var hoverBkColor        = "hsl(" + hsl.h + ", 30% ," + (hsl.l + (turningPoint * 60)) + "%)";
+        var hoverColor          = "white";
+
+        var css = "\
+            .new-biblebook-striped > tbody > tr:nth-child(odd) > td,\
+            .new-biblebook-striped > tbody > tr:nth-child(odd) > th {\
+                  background-color: " + stripedOddColor + ";\
+            }" +
+            ".new-biblebook-striped > tbody > tr:nth-child(even) > td,\
+            .new-biblebook-striped > tbody > tr:nth-child(even) > th {\
+                  background-color: " + stripedEvenColor + ";\
+            }" +
+            ".new-biblebook-hover > tbody > tr:hover > td,\
+            .new-biblebook-hover > tbody > tr:hover > th {\
+                  background-color: " + hoverBkColor + " ;\
+                  color: " + hoverColor + ";\
+            }" +
+            ".new-menu-bar {\
+                 background-color: " + menuBkColor + " ;"+
+                "background-image: -webkit-linear-gradient(top," + menuBkColorEnd + "," +  menuBkColor + "," + menuBkColorEnd + ");" +
+                "background-image:    -moz-linear-gradient(top," + menuBkColorEnd + "," +  menuBkColor + "," + menuBkColorEnd + ");" +
+                "background-image:      -o-linear-gradient(top," + menuBkColorEnd + "," +  menuBkColor + "," + menuBkColorEnd + ");" +
+                "background-image:         linear-gradient(to bottom," + menuBkColorEnd + "," +  menuBkColor + "," + menuBkColorEnd + ");" +
+            "}" +
+            ".new-title-bar {\
+                   background-color: " + titleBarBkColor + " ;\
+                   color: " + frontColor + " ;\
+                   font-weight: bold;\
+            }"  ;
+        $style.html(css);   //replace the current style in head by newbiblebook
+       // alert(css);
+        $('.biblebook-striped').removeClass('biblebook-striped').addClass('new-biblebook-striped');  // replace old class by the new one in style now
+        $('.biblebook-hover').removeClass('biblebook-hover').addClass('new-biblebook-hover');  // replace old class by the new one in style now
+        $('.menu-bar').removeClass('menu-bar').addClass('new-menu-bar');  // replace old class by the new one in style now
+        $('.title-bar').removeClass('title-bar').addClass('new-title-bar');  // replace old class by the new one in style now       
+    };
+    //-------------------------------------
     this.init();
 
 }]);
@@ -715,5 +812,23 @@ app.directive('stringToNumber', function() {
             });
         }
     };
+});
+/*---------------------------------------------------------------------------------------------------------
+                                            controller General
+--------------------------------------------------------------------------------------------------------- */
+app.controller('controllerGeneral', function () {
+
+    this.range = function (min, max, step) {
+        var arInt = [];
+        for (var i = min; i <= max ; i += step)
+            arInt.push(i);
+        return arInt;
+    }
+
+    this.cloneObject = function (obj) {
+        var cloneOfObj = JSON.parse(JSON.stringify(obj));  //clone properties not methods
+        return cloneOfObj;
+    }
+
 });
 /*--------------------------------------------------------------------------------------------------------- */

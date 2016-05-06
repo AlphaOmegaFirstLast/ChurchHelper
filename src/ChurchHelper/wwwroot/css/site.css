@@ -1,13 +1,13 @@
 ﻿body {
-    padding-top: 50px;
+    padding-top: 45px;
     padding-bottom: 20px;
 }
 
 /* Wrapping element */
 /* Set some basic padding to keep content from hitting the edges */
 .body-content {
-    padding-left: 15px;
-    padding-right: 15px;
+    padding-left: 0px;
+    padding-right: 0px;
 }
 
 /* Set widths on the form inputs since otherwise they're 100% wide */
@@ -31,10 +31,9 @@ textarea {
     .carousel-caption {
         z-index: 10 !important;
     }
-
 }
 
-    .borderless table, .borderless td, .borderless th{
+.borderless table, .borderless td, .borderless th {
     border-top-style: none;
     border-left-style: none;
     border-right-style: none;
@@ -43,23 +42,36 @@ textarea {
 
 .biblebook-striped > tbody > tr:nth-child(odd) > td,
 .biblebook-striped > tbody > tr:nth-child(odd) > th {
-  background-color: #ebf6fa;
+    background-color: hsl(186, 50%, 96%);
 }
 
 .biblebook-striped > tbody > tr:nth-child(even) > td,
 .biblebook-striped > tbody > tr:nth-child(even) > th {
-  background-color: #c2e3f0;
+    background-color: hsl(186, 50%, 86%);
 }
 
 .biblebook-hover > tbody > tr:hover > td,
 .biblebook-hover > tbody > tr:hover > th {
-  background-color: #98d0e6 ;
-  color: #1e617b;
+    background-color: hsl(186, 30%, 36%);
+    color: white;
 }
 
-.biblebook-selected {
-    background-color: #46abd2 !important;
-    color: #1e617b !important;
+.biblebook-selected > tbody > tr:hover > td,
+.biblebook-selected > tbody > tr:hover > th {
+    background-color: hsl(186, 30%, 20%);
+    color: white;
+}
+
+.menu-bar {
+    background-color: hsl(186, 50%, 96%);
+    background-image: -webkit-linear-gradient(top, hsl(186, 50%, 95%), hsl(186, 50%, 96%), hsl(186, 50%, 95%));
+    background-image: -moz-linear-gradient(top, hsl(186, 50%, 95%), hsl(186, 50%, 96%), hsl(186, 50%, 95%));
+    background-image: -o-linear-gradient(top, hsl(186, 50%, 95%), hsl(186, 50%, 96%), hsl(186, 50%, 95%));
+    background-image: linear-gradient(to bottom, hsl(186, 50%, 95%), hsl(186, 50%, 96%), hsl(186, 50%, 95%));
+}
+
+.title-bar {
+    background-color: hsl(186, 50%, 86%);
+    color: black;
     font-weight: bold;
- 
 }

@@ -1,0 +1,75 @@
+﻿        // was able to connect to vmElastiSearch after defining and using a dns for it
+        // using fiddler
+        // Get http://13.73.104.255:80/elasticsearch/bibles
+        // User-Agent: Fiddler
+        // Host: 13.73.104.255:80
+        // Authorization: Basic dXNlcjpiaXRuYW1p
+
+
+https://manage.windowsazure.com/@suzetteantonyhotmail.onmicrosoft.com
+using Nest Api [an Example by FacetFlow] https://facetflow.freshdesk.com/support/solutions/articles/6000118832--net-tutorial
+=========================================
+/ Install NEST via Visual Studio's Package Manager Console.
+
+PM> Install-Package NEST
+
+// Index a document against your cluster URL @ https://azure-b40e2c61020e41ec8f6c0b5b1411b0a6.west-us.azr.facetflow.io.
+// Your API key 'cGYTpIgSUuwTMYplDaTEgJAnFc8thoES' must be supplied to authenticate the request.
+
+var uri = new Uri("https://cGYTpIgSUuwTMYplDaTEgJAnFc8thoES:@azure-b40e2c61020e41ec8f6c0b5b1411b0a6.west-us.azr.facetflow.io");
+var settings = new ConnectionSettings(uri).SetDefaultIndex("my_index");
+var client = new ElasticClient(settings);
+
+var post = new Post
+            {
+              Id = 1,
+              User = "me",
+              PostDate = DateTime.Now,
+              Message = "trying out facetflow"
+            };
+
+client.Index(post);
+client.Refresh();
+
+// Execute a search using the connection from above.
+
+var result = client.Search<Post>(s => s
+                   .Index("my_index")
+                   .Query(q => q.QueryString(qs => qs.Query("trying out facetflow")))
+                   .Filter(f => f.Term(t => t.User, "me")));
+
+// Now that you've got basic indexing and search working, feel free to dive into more
+// details on the NEST API and the Elasticsearch API in their respective official guides.
+
+THIS IS EQUAVELENT to curl
+
+# Index a document against your cluster URL @ https://azure-b40e2c61020e41ec8f6c0b5b1411b0a6.west-us.azr.facetflow.io.
+# Your API key 'cGYTpIgSUuwTMYplDaTEgJAnFc8thoES' must be supplied to authenticate the request.
+# Always keep your API key safe, never expose it in client facing code (such as JavaScript).
+
+$ curl -u cGYTpIgSUuwTMYplDaTEgJAnFc8thoES: \
+       -XPOST 'https://azure-b40e2c61020e41ec8f6c0b5b1411b0a6.west-us.azr.facetflow.io/my_index/posts' -d '{
+    "user": "me",
+    "post_date": "2016-05-05T02:26:52.054Z",
+    "message": "trying out facetflow"
+  }'
+
+# Execute a search.
+
+$ curl -XGET 'https://azure-b40e2c61020e41ec8f6c0b5b1411b0a6.west-us.azr.facetflow.io/my_index/_search' -d '{
+     "query": {
+        "filtered": {
+            "query": {
+                "query_string": {
+                    "query": "trying out facetflow"
+                }
+            },
+            "filter": {
+                "term": { "user": "me" }
+            }
+        }
+     }
+  }'
+
+# Now that you've got basic indexing and search working, feel free to dive into more
+# details on the Elasticsearch API in the official Elasticsearch documentation.

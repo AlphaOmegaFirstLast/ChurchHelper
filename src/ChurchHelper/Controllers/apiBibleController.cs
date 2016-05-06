@@ -52,10 +52,10 @@ namespace ChurchHelper.Controllers
         }
 
         [HttpGet]
-        [Route("apiBible/ReindexKJV")]
-        public async Task<ApiResponse<string>> ReindexKJV()
+        [Route("apiBible/ReindexNKJV")]
+        public async Task<ApiResponse<string>> ReindexNKJV()
         {
-            return await _bibleManager.ReindexKJV();
+            return await _bibleManager.ReindexNKJV();
         }
 
         [HttpGet]

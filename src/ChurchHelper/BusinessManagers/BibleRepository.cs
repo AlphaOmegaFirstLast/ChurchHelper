@@ -16,15 +16,19 @@ namespace ChurchHelper.BusinessManagers
 {
     class BibleRepository : IBibleRepository
     {
+        private readonly IOptions<Config> _config;
         private readonly IOptions<List<Bible>> _bibleList;
         private readonly IRequestManager _requestManager;
-        private string _readIndex = "http://localhost:9200/bibles/"; //  "http://localhost:9200/bible/";
-        private string _writeIndex = "http://localhost:9200/bibles/NKJV/";//VanDyke
+        private string _readIndex;
+        private string _writeIndex;
 
-        public BibleRepository(IOptions<List<Bible>> bibleList,IRequestManager requestClient)
+        public BibleRepository(IOptions<Config> config , IOptions<List<Bible>> bibleList, IRequestManager requestClient)
         {
             _bibleList = bibleList;
             _requestManager = requestClient;
+            _config = config;
+            _readIndex = ((Config)_config.Value).ElasticSearchReadIndex;
+            _writeIndex = ((Config)_config.Value).ElasticSearchWriteIndex;
         }
 
         public string ReadIndex
@@ -159,7 +163,7 @@ namespace ChurchHelper.BusinessManagers
                     RecPerPage = recPerPage,
                     CurrentPage = currentPage,
                     TotalRecCount = esResponse.Data.hits.total,
-                    TotalPageCount = Convert.ToInt16(Math.Ceiling(Convert.ToDecimal(esResponse.Data.hits.total/recPerPage)))
+                    TotalPageCount = Convert.ToInt16(Math.Ceiling(Convert.ToDecimal(esResponse.Data.hits.total)/recPerPage))
                 };
 
                 response.Data = new List<BibleVerse>();

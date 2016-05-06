@@ -37,7 +37,7 @@ namespace ChurchHelper.BusinessManagers
 
         public async Task<ApiResponse<string>> ReindexVanDyke()
         {
-            var directoryName = @"C:\Suzette\TheArabicBible\The Arabic Bible\BibleCopies\VanDyke\";  //@"C:\Temp\bibletext\";
+            var directoryName = @"..\App_Data\Bibles\VanDyke\";// @"C:\Suzette\TheArabicBible\The Arabic Bible\BibleCopies\VanDyke\";  
             var books = System.IO.Directory.GetFiles(directoryName);
 
             foreach (var book in books)
@@ -102,7 +102,7 @@ namespace ChurchHelper.BusinessManagers
             return new ApiResponse<string>();//todo set status to false
         }
 
-        public async Task<ApiResponse<string>> ReindexKJV()
+        public async Task<ApiResponse<string>> ReindexNKJV()
         {
             var fileName = @"C:\Suzette\TheArabicBible\The Arabic Bible\BibleCopies\KJV\King-James-Bible-KJV-Bible-Clean.txt";
 

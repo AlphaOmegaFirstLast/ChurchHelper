@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>@ViewData["Title"] - ChurchHelper</title>
 
-        <environment names="Development">
+        <environment names="Development,Local">
             <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
             <link rel="stylesheet" href="~/lib/bootstrap-touch-carousel/dist/css/bootstrap-touch-carousel.css" />
             <link rel="stylesheet" href="~/css/site.css" />
@@ -21,7 +21,7 @@
             @RenderBody()
         </div>
 
-        <environment names="Development">
+        <environment names="Development,Local">
             <script src="~/lib/jquery/dist/jquery.js"></script>
             <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
             <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>

@@ -7,6 +7,7 @@ using ChurchHelper.BusinessManagers;
 using ChurchHelper.BusinessModels;
 using ChurchHelper.SystemInterfaces;
 using ChurchHelper.SystemManagers;
+using ChurchHelper.SystemModels;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
 using Microsoft.Dnx.Runtime;
@@ -23,7 +24,7 @@ namespace ChurchHelper
             // Setup configuration sources.
             var builder = new ConfigurationBuilder()
                 .SetBasePath(appEnv.ApplicationBasePath)
-                .AddJsonFile("appsettings.json")
+                .AddJsonFile($"app_config/config.{env.EnvironmentName}.json")
                 .AddJsonFile("app_data/BibleLists.json")  //todo general exception handler an logger .. ie if file not found
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
@@ -37,6 +38,7 @@ namespace ChurchHelper
             // Add MVC services to the services container.
             services.AddMvc();
             services.Configure<List<Bible>>(Configuration.GetSection("BibleList"));  // it is registered as IOption<Bible> service now
+            services.Configure<Config>(Configuration.GetSection("Config"));  // it is registered as IOption<Bible> service now
 
             services.AddTransient<ISerializer, NewtonSoftSerializer>();
             services.AddTransient<IRequestClient, RequestClient>();
