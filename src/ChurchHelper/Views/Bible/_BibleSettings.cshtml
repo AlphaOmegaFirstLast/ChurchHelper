@@ -1,41 +1,82 @@
-﻿<div  ng-controller="controllerStyles as styleSettings">
-    
-    <button type="button" class="btn btn-info"  ng-click="styleSettings.clickSaveSettings">Save</button>
-    <table>
-        <tr>
-            <td>
-                Background Color
-            </td>
-            <td>
-                <input type="color"  ng-change="styleSettings.setBackgroundColor()" ng-model="styleSettings.settings.backgroundColor" ng-init="styleSettings.settings.backgroundColor" style="width: 85%;">
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Font Color
-            </td>
-            <td>
-                <input type="color"  ng-change="styleSettings.setFontColor()" ng-model="styleSettings.settings.fontColor" style="width: 85%;">
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Background Image
-            </td>
-            <td>
-                <input type="image" ng-model="styleSettings.settings.backgroundImage" style="width: 85%;">
-            </td>
-        </tr>
-        <tr>
-            <td>
-               Font Size
-            </td>
-            <td>
-                <input type="number" string-to-number min="12" max="64" ng-change="styleSettings.setFontSize()" ng-model="styleSettings.settings.fontSize"  />
-                
-            <input type="range"  min="12" max="64" ng-change="styleSettings.setFontSize()" ng-model="styleSettings.settings.fontSize" />
-            </td>
-        </tr>
-    </table>
-    
+﻿<div  ng-controller="controllerStyles as ngStyles">
+
+    <button type="button" class="btn btn-do" ng-click="ngStyles.clickSaveSettings()">Save</button>
+    <div class="row">
+        <div class="col-sm-7">
+            <table class="table table-striped">
+                <tr>
+                    <td style="width: 30%;">
+                        Background Color
+                    </td>
+                    <td>
+                        <input type="color" class="btn" ng-change="ngStyles.setBackgroundColor()" ng-model="ngStyles.settings.backgroundColor" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Font Color
+                    </td>
+                    <td>
+                        <input type="color" class="btn" ng-change="ngStyles.setFontColor()" ng-model="ngStyles.settings.fontColor" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Background Image
+                    </td>
+                    <td>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <input type="radio"  ng-change="ngStyles.setBackgroundImage()" ng-model="ngStyles.settings.backgroundImage" value="none">
+                                none
+                            </div>
+                            <div class="col-sm-3">
+                                <input type="radio" ng-change="ngStyles.setBackgroundImage()" ng-model="ngStyles.settings.backgroundImage" value="bg-wallpaper-blue.jpg">
+                                <img src="../../images/bg-wallpaper-blue.jpg" class="img-thumbnail" width="80" heigh="80" />
+                            </div>
+                            <div class="col-sm-3">
+                                <input type="radio" ng-change="ngStyles.setBackgroundImage()" ng-model="ngStyles.settings.backgroundImage" value="bg-autumn.jpg">
+                                <img src="../../images/bg-autumn.jpg" class="img-thumbnail" width="80" heigh="80" />
+                            </div>
+                            <div class="col-sm-3">
+                                <input type="radio" ng-change="ngStyles.setBackgroundImage()" ng-model="ngStyles.settings.backgroundImage" value="bg-wallpaper-pink.jpg">
+                                <img src="../../images/bg-wallpaper-pink.jpg" class="img-thumbnail" width="80" heigh="80" />
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 30%;">
+                        Background Image display
+                    </td>
+                    <td>
+                        <input type="radio" ng-change="ngStyles.setBackgroundRepeat()" ng-model="ngStyles.settings.backgroundRepeat" value="stretch">
+                        stretch
+                        <input type="radio" ng-change="ngStyles.setBackgroundRepeat()" ng-model="ngStyles.settings.backgroundRepeat" value="repeat">
+                        repeat
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Font Size
+                    </td>
+                    <td>
+                        <input type="number" class="form-control" string-to-number min="12" max="64" ng-change="ngStyles.setFontSize()" ng-model="ngStyles.settings.fontSize" />
+
+                        <input type="range" class="form-control" min="12" max="64" ng-change="ngStyles.setFontSize()" ng-model="ngStyles.settings.fontSize" />
+                    </td>
+                </tr>
+            </table>   
+        </div>
+            <div class="col-sm-5">
+                <div style="height: 200px; padding: 5px; border-style: solid; border-color: silver; border-width: 2px;">
+                    <div style="height: 100%;" ng-style="ngStyles.displayStyle()">
+                        <div style="text-align: center; vert-align: middle;  vertical-align: middle;">
+                            Sample Text.
+                        </div>                        
+                    </div>
+                </div>
+            </div>
+    </div>
+   
 </div>

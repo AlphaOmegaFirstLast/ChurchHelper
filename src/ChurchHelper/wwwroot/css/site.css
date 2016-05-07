@@ -42,23 +42,22 @@ textarea {
 
 .biblebook-striped > tbody > tr:nth-child(odd) > td,
 .biblebook-striped > tbody > tr:nth-child(odd) > th {
-    background-color: hsl(186, 50%, 96%);
+    background-color: hsl(186, 50%, 95%);
 }
 
 .biblebook-striped > tbody > tr:nth-child(even) > td,
 .biblebook-striped > tbody > tr:nth-child(even) > th {
-    background-color: hsl(186, 50%, 86%);
+    background-color: hsl(186, 50%, 87%);
 }
 
 .biblebook-hover > tbody > tr:hover > td,
 .biblebook-hover > tbody > tr:hover > th {
-    background-color: hsl(186, 30%, 36%);
+    background-color: hsl(186, 30%, 75%);
     color: white;
 }
 
-.biblebook-selected > tbody > tr:hover > td,
-.biblebook-selected > tbody > tr:hover > th {
-    background-color: hsl(186, 30%, 20%);
+.biblebook-selected {
+    background-color: hsl(186, 20%, 65%) !important;
     color: white;
 }
 
@@ -72,6 +71,22 @@ textarea {
 
 .title-bar {
     background-color: hsl(186, 50%, 86%);
-    color: black;
     font-weight: bold;
+}
+
+.btn-do {
+  color: #ffffff;
+  background-color: #5bc0de;
+  border-color: #46b8da;
+}
+
+.btn-do:hover, .btn-do:focus, .btn-do:active, .btn-do.active, .open .dropdown-toggle.btn-do {
+  color: #ffffff;
+  background-color: #39b3d7;
+  border-color: #269abc;
+}
+
+.content-vertical-scroll {
+    height: 85vh;
+    overflow-y: scroll;
 }

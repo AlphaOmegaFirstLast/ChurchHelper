@@ -1,55 +1,58 @@
-﻿@{
+﻿@using System.Security.Policy
+@{
     ViewData["Title"] = "Bible Title";
 }
-<body ng-app="appBibleContents">
-    <div class="navbar navbar-fixed-top" ng-controller="controllerBibleSettings as bibleSettings">
-        <div class="container menu-bar">
+<div ng-app="appBibleContents">
 
-            <ul id="menuTabs" class="nav nav-tabs" role="tablist">
-                <li><a asp-controller="Home" asp-action="Index">ChurchHelper</a></li>
-                <li><a role="tab" data-toggle="tab" href="#divContent" aria-controls="content">Contents</a></li>
-                <li><a role="tab" data-toggle="tab" href="#divDisplay" aria-controls="display">Display</a></li>
-                <li><a role="tab" data-toggle="tab" href="#divSearch" aria-controls="search">Search</a></li>
-                <li><a role="tab" data-toggle="tab" href="#divService" aria-controls="service">Service</a></li>
-                <li><a role="tab" data-toggle="tab" href="#divSettings" aria-controls="settings">Settings</a></li>
+        <div class="navbar navbar-fixed-top" ng-controller="controllerBibleSettings as bibleSettings">
+            <div class="container menu-bar">
 
-                <li style="float: right; margin-top: 3px;">
-                        <input class="form-control" style="width: 70px;" type="number" min="1" max="10" ng-change="bibleSettings.setVersesPerPage()" ng-model="bibleSettings.settings.versesPerPage" ng-init="bibleSettings.settings.versesPerPage" />                       
-                </li>
-                <li style="float: right; margin-top: 3px;">
-                    <select class="form-control" ng-model="selectedItem" ng-change="bibleSettings.setBibleId(selectedItem)" ng-init="selectedItem='1'">
-                        <option ng-repeat="item in bibleSettings.bibles" value="{{item.id}}">{{item.name}}</option>
-                    </select>
-                </li>
-            </ul>
-        </div>
-    </div>
+                <ul id="menuTabs" class="nav nav-tabs" role="tablist">
+                    <li><a asp-controller="Home" asp-action="Index">ChurchHelper</a></li>
+                    <li><a role="tab" data-toggle="tab" href="#divContent" aria-controls="content">Contents</a></li>
+                    <li><a role="tab" data-toggle="tab" href="#divDisplay" aria-controls="display">Display</a></li>
+                    <li><a role="tab" data-toggle="tab" href="#divSearch" aria-controls="search">Search</a></li>
+                    <li><a role="tab" data-toggle="tab" href="#divService" aria-controls="service">Service</a></li>
+                    <li><a role="tab" data-toggle="tab" href="#divSettings" aria-controls="settings">Settings</a></li>
 
-    <div id="dvMessage" class="text-danger"> </div><button type="button" id="btnClearMessage" class="glyphicon glyphicon-off" style="display: none;" onclick=" dvMessage.innerHTML='' ; btnClearMessage.style.display='none';"></button>
+                    <li style="float: right; margin-top: 3px;">
+                        <input class="form-control" style="width: 70px;" type="number" min="1" max="10" ng-change="bibleSettings.setVersesPerPage()" ng-model="bibleSettings.settings.versesPerPage" ng-init="bibleSettings.settings.versesPerPage" />
+                    </li>
+                    <li style="float: right; margin-top: 3px;">
+                        <select class="form-control" ng-model="selectedItem" ng-change="bibleSettings.setBibleId(selectedItem)" ng-init="selectedItem='1'">
+                            <option ng-repeat="item in bibleSettings.bibles" value="{{item.id}}">{{item.name}}</option>
+                        </select>
+                    </li>
+                </ul>
+            </div>
+        </div>
 
-    <div class="tab-content" id="divPanels" role="tablist" aria-multiselectable="true">
-        <div id="divContent" class="tab-pane active" role="tabpanel">
-            @Html.Partial("~/Views/Bible/_BibleContent")
-        </div>
-        <div id="divDisplay" class="tab-pane" role="tabpanel">
-            @Html.Partial("~/Views/Bible/_BibleDisplay")
-        </div>
-        <div id="divSearch" class="tab-pane" role="tabpanel">
-            @Html.Partial("~/Views/Bible/_BibleSearch")
-        </div>
-        <div id="divService" class="tab-pane" role="tabpanel">
-            @Html.Partial("~/Views/Bible/_BibleService")
-        </div>
-        <div id="divSettings" class="tab-pane" role="tabpanel">
-            @Html.Partial("~/Views/Bible/_BibleSettings")
-        </div>
-    </div>
+        <div id="dvMessage" class="text-danger"> </div><button type="button" id="btnClearMessage" class="glyphicon glyphicon-off" style="display: none;" onclick=" dvMessage.innerHTML='' ; btnClearMessage.style.display='none' ;"></button>
 
-</body>
+        <div class="tab-content" id="divPanels" role="tablist" aria-multiselectable="true">
+
+            <div id="divContent" class="tab-pane active" role="tabpanel">
+                @Html.Partial("~/Views/Bible/_BibleContent")
+            </div>
+            <div id="divDisplay" class="tab-pane" role="tabpanel">
+                @Html.Partial("~/Views/Bible/_BibleDisplay")
+            </div>
+            <div id="divSearch" class="tab-pane" role="tabpanel">
+                @Html.Partial("~/Views/Bible/_BibleSearch")
+            </div>
+            <div id="divService" class="tab-pane" role="tabpanel">
+                @Html.Partial("~/Views/Bible/_BibleService")
+            </div>
+            <div id="divSettings" class="tab-pane" role="tabpanel">
+                @Html.Partial("~/Views/Bible/_BibleSettings")
+            </div>
+        </div>
+</div>
 
 @section scripts
 {
-    <script type="text/javascript" src="@Url.Content("/js/ngBibleContents.js")"></script>
+<script type="text/javascript" src="@Url.Content("/js/ngServices.js")"></script>
+<script type="text/javascript" src="@Url.Content("/js/ngBibleControllers.js")"></script>
 }
 
 

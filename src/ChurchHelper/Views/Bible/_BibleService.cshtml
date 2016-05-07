@@ -1,1 +1,11 @@
-﻿
+﻿<div ng-controller="controllerService as ngService">
+    <button class="btn btn-do" ng-click="ngService.startDisplay(1)">Display Service</button>
+
+    <table class="table biblebook-striped biblebook-hover table-bordered block">
+        <tr ng-repeat="item in ngService.arDisplay">
+            <td>{{item.label}}</td>
+            <td>{{item.text}}</td>
+        </tr>
+    </table>
+
+</div>

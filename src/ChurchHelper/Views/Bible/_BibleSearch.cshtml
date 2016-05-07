@@ -1,13 +1,15 @@
-﻿<div ng-controller="controllerSearch as ngSearch">
+﻿
+<div ng-controller="controllerSearch as ngSearch">
     <table>
         <tr>
             <td style="vertical-align: top; width: 700px;">
-                <table  style="vertical-align: top;">
+                <table style="vertical-align: top;">
                     <tr>
                         <td>
-                            <button class="btn btn-info" ng-click="ngSearch.doSearch(1)">Search</button>
+                            <button class="btn btn-do" ng-click="ngSearch.doSearch(1)">Search</button>
                         </td>
-                        <td><div ng-if="ngSearch.pagination.TotalRecCount>0">{{ngSearch.pagination.TotalRecCount}}  Verse found.</div></td>
+                        <td>
+                            <div ng-if="ngSearch.pagination.TotalRecCount>0">{{ngSearch.pagination.TotalRecCount}} Verse found.</div></td>
                         <td>
                             <ul class="pagination" ng-if="ngSearch.pagination.TotalRecCount>0">
                                 <li>
@@ -30,7 +32,7 @@
                         <td><select class="form-control input-sm" style="width: auto" ng-model="ngSearch.selectedSearchOption" ng-options="op.caption for op in ngSearch.searchOptions" ng-init="ngSearch.selectedSearchOption = ngSearch.searchOptions[0]"/>
                         </td>
                         <td><input type="text" class="form-control input-sm" placeholder="search" ng-model="ngSearch.searchTerm">
-                        </td>                       
+                        </td>
                     </tr>
                 </table>
 
@@ -41,7 +43,7 @@
                         <td> {{verse.VerseNo}} </td>
                         <td style="width: 100%"> {{verse.VerseText}} </td>
                         <td style="vertical-align: middle;">
-                             <button class="btn glyphicon glyphicon-unchecked" ng-click="ngSearch.startDisplay($index+1)" data-toggle="tooltip" data-placement="bottom" title="display context"></button>
+                            <button class="btn glyphicon glyphicon-unchecked" ng-click="ngSearch.startDisplay($index+1)" data-toggle="tooltip" data-placement="bottom" title="display context"></button>
                         </td>
                         <td style="vertical-align: middle;">
                             <button class="btn glyphicon glyphicon-list-alt" ng-click="ngSearch.goContext(verse.BookId , verse.ChapterId, verse.VerseNo)" data-toggle="tooltip" data-placement="bottom" title="display search results"></button>
@@ -60,12 +62,12 @@
                     <table class="text-sm">
                         <tr>
                             <td colspan="4" ng-click="ngSearch.clickBible()">
-                                <button type="button" class="btn btn-info btn-sm btn-block"> {{ngSearch.bibleStructure.Title}} </button>
+                                <button type="button" class="btn btn-do btn-sm btn-block"> {{ngSearch.bibleStructure.Title}} </button>
                             </td>
                         </tr>
                         <tr>
                             <td colspan="2" ng-repeat="testment in ngSearch.bibleStructure.Testments ">
-                                <button type="button" class="btn btn-info btn-sm btn-block" ng-click="ngSearch.clickTestment(testment)"> {{testment.Name}} </button>
+                                <button type="button" class="btn btn-do btn-sm btn-block" ng-click="ngSearch.clickTestment(testment)"> {{testment.Name}} </button>
                             </td>
                         </tr>
                         <tr>
@@ -73,9 +75,9 @@
                                 <table>
                                     <tr ng-repeat="group in ngSearch.showGroup(groupColumn) ">
                                         <td>
-                                            <button type="button" class="btn btn-info btn-sm btn-block" ng-click="ngSearch.clickGroup(group)">{{group.Name}} </button>
+                                            <button type="button" class="btn btn-do btn-sm btn-block" ng-click="ngSearch.clickGroup(group)">{{group.Name}} </button>
                                             <div ng-repeat="book in group.Books">
-                                                <input type="checkbox" ng-model="book.boolSelected" ng-click="ngSearch.clickBook(book)" /> {{book.Name}}
+                                                <input type="checkbox" ng-model="book.boolSelected" ng-click="ngSearch.clickBook(book)"/> {{book.Name}}
                                             </div>
                                         </td>
                                     </tr>

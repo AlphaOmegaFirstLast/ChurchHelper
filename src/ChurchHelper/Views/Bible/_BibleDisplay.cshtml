@@ -1,6 +1,5 @@
 ﻿<div ng-controller="controllerDisplay as ngDisplay">
 
-
     <div class="title-bar">
         <table>
             <tr>
@@ -21,17 +20,18 @@
 
 
     <div ng-controller="controllerStyles as ngStyles">
-        <div ng-style="ngStyles.displayStyle()">
+        
+        <div id="display-background" ng-style="ngStyles.displayStyle()" style="height: 84vh;">
+
             <table class="table table-condensed block">
 
                 <tr ng-repeat="item in ngDisplay.selectedDisplay">
                     <td style="font-size: 12px;">{{item.label}}.</td>
                     <td style="width: 100%;">{{item.text}}</td>
                 </tr>
-
             </table>
         </div>
-        <input class="navbar-fixed-bottom" style="max-width: 100%; width: 100%" type="range" min="12" max="64" ng-change="ngStyles.setFontSize()" ng-model="ngStyles.settings.fontSize" />
+        <input class="navbar-fixed-bottom" style="max-width: 100%; width: 100%" type="range" min="12" max="64" ng-change="ngStyles.setFontSize()" ng-model="ngStyles.settings.fontSize"/>
     </div>
-
 </div>
+  
