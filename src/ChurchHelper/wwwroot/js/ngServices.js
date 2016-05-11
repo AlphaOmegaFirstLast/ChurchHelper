@@ -17,6 +17,9 @@
                     if (apiResponse.Status.Ok) {
                         $rootScope.bibleStructures = apiResponse.Data; //intended to be 2 bible structures each in a different language
                         $rootScope.bibleStructures.unshift(apiResponse.Data[0]); //add an extra bible at the position of 0 as default and to make switch between bible versions easier
+
+                        $rootScope.$broadcast('serviceApiCalls-bibleStructurePopulated');   //raise event to whom may concern
+
                     } else {
                         me.failureApiCall(apiResponse);
                     }
@@ -30,6 +33,32 @@
                     var apiResponse = response.data;
                     if (apiResponse.Status.Ok) {
                         callBack(apiResponse.Data);
+                    } else {
+                        me.failureApiCall(apiResponse);
+                    }
+                }, this.failureHttpRequest);
+        }
+        //--------------------------------------------------------------------------------------
+        this.getVerseInBibles = function (bookId, chapterId, verseNo, callBack) {
+
+            $http.get(apiPath + "GetVerseInBibles/" + bookId + "/" + chapterId + "/" + verseNo)
+                .then(function (response) {
+                    var apiResponse = response.data;
+                    if (apiResponse.Status.Ok) {
+                        callBack(apiResponse.Data);
+                    } else {
+                        me.failureApiCall(apiResponse);
+                    }
+                }, this.failureHttpRequest);
+        }
+        //--------------------------------------------------------------------------------------
+        this.GetVerseTranslations = function (jsonData, callBack) {
+
+            $http.post(apiPath + "GetVerseTranslations", jsonData)
+                .then(function (response) {
+                    var apiResponse = response.data;
+                    if (apiResponse.Status.Ok) {
+                        callBack(apiResponse.Data, apiResponse.Pagination);
                     } else {
                         me.failureApiCall(apiResponse);
                     }
@@ -64,34 +93,35 @@
     /*---------------------------------------------------------------------------------------------------------
                                                 Service Display
     --------------------------------------------------------------------------------------------------------- */
-    app.service('serviceDisplay', function () {
+    app.service('serviceDisplay', [ '$rootScope', function ($rootScope) {
         var me = this;
-        this.publish = [];                                      // array of subscribers
-        this.arDisplayData = [];                                // array of data to display  
-        this.currentIndex = 1;
-        this.titlePrefix = "";
+        this.arDisplayData = [];
 
-        this.registerSubscriber = function (callback) {         //build publish array
-            me.publish.push(callback);
+        this.setDisplayData = function (data, index, titlePrefix, id) {
+            var iconId = "";
+            switch (id) {
+                case "content":
+                    iconId = "glyphicon glyphicon-book icon-next";
+                    break;
+                case "search":
+                    iconId = "glyphicon glyphicon-search icon-next";
+                    break;
+                case "service":
+                    iconId = "glyphicon glyphicon-edit icon-next";
+                    break;
+            }
+            var displayObj = { id: id, data: data, index: index, titlePrefix: titlePrefix, iconId: iconId };
+            me.arDisplayData[id] = displayObj;
+            $rootScope.$broadcast('serviceDisplay-displayDataChanged', displayObj); //raise event to nofity others (ie displayController) that data changed
+
         };
 
-        this.setDisplayData = function (data, index, titlePrefix) {
-            me.currentIndex = index;                           // when bible, book or chapter changes
-            me.titlePrefix = titlePrefix;
-            me.arDisplayData = data;
-            me.publish.forEach(function (p) {
-                p("dataChange");
-            });
-        }
+        this.startDisplay = function (index, id) {
+            me.arDisplayData[id].index = index;
+            $rootScope.$broadcast('serviceDisplay-displayStarted', me.arDisplayData[id] ); // when user clicks a certain index to go display, fire a signal to start display
+        };
 
-        this.startDisplay = function (index) {
-            me.currentIndex = index;
-            me.publish.forEach(function (p) {                 // when user clicks a certain index to go display, fire a signal to start display
-                p("switchTab");
-            });
-        }
-
-    });
+    }]);
     /*---------------------------------------------------------------------------------------------------------
                                                 service Bible Settings
     --------------------------------------------------------------------------------------------------------- */
@@ -100,22 +130,17 @@
         this.publish = [];
         this.settings = { versesPerPage: 2, bibleId: 1, align: "right", language: "arabic" };
 
-        this.getSettings = function () {
-            return me.settings;
-        };
-
         this.registerSubscriber = function (callback) {
             me.publish.push(callback);
         };
 
         this.initSettings = function () {
             var settings = getCookie("bibleSettings");
-            if (settings != null && settings != '')
+            if (settings != null && settings != "") {
                 me.settings = JSON.parse(settings);
-
-            me.publish.forEach(function (p) {
-                p();
-            });
+                me.setBibleId(me.settings.bibleId);   // this will fire bibleChanged event
+            }
+            $rootScope.$broadcast('serviceBibleSettings-init', { 'settings': me.settings });   //raise event to whom may concern (ie controllers: bible , search)
         };
 
         this.saveSettings = function () {
@@ -130,39 +155,36 @@
         }
 
         this.setBibleId = function (bibleId) {
-            me.settings.bibleId = bibleId;
-            var index = parseInt(bibleId);
-            if ($rootScope.bibleStructures != null && $rootScope.bibleStructures[index] != null) {
-                me.settings.align = $rootScope.bibleStructures[index].Alignment;
-                me.settings.language = $rootScope.bibleStructures[index].Language;
+            if (me.settings.bibleId != bibleId) {
+                me.settings.bibleId = bibleId;
+                var index = parseInt(bibleId);
+                if ($rootScope.bibleStructures != null && $rootScope.bibleStructures[index] != null) {
+                    me.settings.align = $rootScope.bibleStructures[index].Alignment;
+                    me.settings.language = $rootScope.bibleStructures[index].Language;
+                }
+                $rootScope.$broadcast('serviceBibleSettings-bibleChanged', { 'bibleId': bibleId });   //raise event to whom may concern (ie controllers: bible , search)
+                me.publish.forEach(function (p) {                                                     // notify subscribers (ie services: styleSettings)
+                    p();
+                });
             }
-            me.publish.forEach(function (p) {
-                p();
-            });
         }
-
     }]);
 
     /*---------------------------------------------------------------------------------------------------------
                                                 service StyleSettings
     --------------------------------------------------------------------------------------------------------- */
-    app.service('serviceStyleSettings', ['serviceBibleSettings', function (serviceBibleSettings) {
+    app.service('serviceStyleSettings', ['serviceBibleSettings', '$rootScope' , function (serviceBibleSettings , $rootScope) {
 
         var me = this;
-        this.publish = [];  // array of function pointers that are subscribed to the service and will be called on updates by the service
         this.settings = { backgroundColor: "aliceblue", backgroundImage: "none", backgroundRepeat: "stretch", fontColor: "black", fontSize: "18", align: "left", language: "english" };
 
-        this.getSettings = function () {
-            return me.settings;
-        };
-
-        this.registerSubscriber = function (callback) {
-            me.publish.push(callback);              // register subscribers
+        this.init = function () {
+            serviceBibleSettings.registerSubscriber(me.updateSubscriber);  //get registered at other publishers
         };
 
         this.initSettings = function () {
             var settings = getCookie("styleSettings");
-            if (settings != null && settings != '')
+            if (settings != null && settings != "")
                 me.settings = JSON.parse(settings);
 
             this.setCssClass(me.settings.fontColor, me.settings.backgroundColor);
@@ -170,61 +192,46 @@
             me.settings.align = serviceBibleSettings.settings.align;
             me.settings.language = serviceBibleSettings.settings.language;
 
-            me.publish.forEach(function (p) {      // publish updates to subscribers
-                p();
-            });
+            $rootScope.$broadcast('serviceStyleSettings-styleChanged', { 'styleSettings': me.settings });   //raise event to whom may concern (ie controllers: bible , search)
         };
+
+        this.updateSubscriber = function () {                              // subscribe to & read from serviceBibleSettings. serviceStyle gets notified by other services (serviceBibleSettings)
+            me.settings.align = serviceBibleSettings.settings.align;
+            me.settings.language = serviceBibleSettings.settings.language;
+
+            $rootScope.$broadcast('serviceStyleSettings-styleChanged', { 'styleSettings': me.settings });   //raise event to whom may concern (ie controllers: bible , search)
+        }
 
         this.saveSettings = function () {
             setCookie("styleSettings", JSON.stringify(me.settings), 1000);
         }
 
-        this.init = function () {
-            serviceBibleSettings.registerSubscriber(me.updateSubscriber);  //get registered at other publishers
-        };
-
-        this.updateSubscriber = function () { // subscribe to & read from serviceBibleSettings
-            me.settings.align = serviceBibleSettings.settings.align;
-            me.settings.language = serviceBibleSettings.settings.language;
-            me.publish.forEach(function (p) {
-                p();
-            });
-        }
-
         this.setFontSize = function (fontSize) { // write from serviceSettings
             me.settings.fontSize = fontSize;
-            me.publish.forEach(function (p) {
-                p();
-            });
+            $rootScope.$broadcast('serviceStyleSettings-styleChanged', { 'styleSettings': me.settings });   //raise event to whom may concern (ie controllers: bible , search)
         }
 
         this.setBackgroundColor = function (backgroundColor) {
             me.settings.backgroundColor = backgroundColor;
-            me.publish.forEach(function (p) {
-                p();
-            });
+            $rootScope.$broadcast('serviceStyleSettings-styleChanged', { 'styleSettings': me.settings });   //raise event to whom may concern (ie controllers: bible , search)
+
             this.setCssClass(me.settings.fontColor, me.settings.backgroundColor);
         }
 
         this.setBackgroundImage = function (backgroundImage) {
             me.settings.backgroundImage = backgroundImage;
-            me.publish.forEach(function (p) {
-                p();
-            });
+            $rootScope.$broadcast('serviceStyleSettings-styleChanged', { 'styleSettings': me.settings });   //raise event to whom may concern (ie controllers: bible , search)
         }
 
         this.setBackgroundRepeat = function (backgroundRepeat) {
             me.settings.backgroundRepeat = backgroundRepeat;
-            me.publish.forEach(function (p) {
-                p();
-            });
+            $rootScope.$broadcast('serviceStyleSettings-styleChanged', { 'styleSettings': me.settings });   //raise event to whom may concern (ie controllers: bible , search)
         }
 
         this.setFontColor = function (fontColor) {
             me.settings.fontColor = fontColor;
-            me.publish.forEach(function (p) {
-                p();
-            });
+            $rootScope.$broadcast('serviceStyleSettings-styleChanged', { 'styleSettings': me.settings });   //raise event to whom may concern (ie controllers: bible , search)
+
             this.setCssClass(me.settings.fontColor, me.settings.backgroundColor);
         }
 
@@ -354,6 +361,7 @@
             $('.menu-bar').removeClass('menu-bar').addClass('new-menu-bar');  // replace old class by the new one in style now
             $('.title-bar').removeClass('title-bar').addClass('new-title-bar');  // replace old class by the new one in style now       
         };
+
         //-------------------------------------
         this.init();
 

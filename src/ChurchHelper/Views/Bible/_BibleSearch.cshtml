@@ -43,16 +43,16 @@
                         <td> {{verse.VerseNo}} </td>
                         <td style="width: 100%"> {{verse.VerseText}} </td>
                         <td style="vertical-align: middle;">
-                            <button class="btn glyphicon glyphicon-unchecked" ng-click="ngSearch.startDisplay($index+1)" data-toggle="tooltip" data-placement="bottom" title="display context"></button>
+                            <button class="btn glyphicon glyphicon-unchecked" ng-click="ngSearch.startDisplay($index+1)" data-toggle="tooltip" data-placement="bottom" title="display search results"></button>
                         </td>
                         <td style="vertical-align: middle;">
-                            <button class="btn glyphicon glyphicon-list-alt" ng-click="ngSearch.goContext(verse.BookId , verse.ChapterId, verse.VerseNo)" data-toggle="tooltip" data-placement="bottom" title="display search results"></button>
+                            <button class="btn glyphicon glyphicon-list-alt" ng-click="ngSearch.goContext(verse.BookId , verse.ChapterId, verse.VerseNo)" data-toggle="tooltip" data-placement="bottom" title="display context"></button>
                         </td>
                         <td style="vertical-align: middle;">
                             <button class="btn glyphicon glyphicon-random" ng-click="ngSearch.getTranslations(verse.BibleId , verse.BookId , verse.ChapterId, verse.VerseNo)" data-toggle="tooltip" data-placement="bottom" title="display different translations"></button>
                         </td>
                         <td style="vertical-align: middle;">
-                            <button class="btn glyphicon glyphicon-log-in" ng-click="ngSearch.sendToService(verse.BibleId, verse.BookId , verse.ChapterId, verse.VerseNo)" data-toggle="tooltip" data-placement="bottom" title="add to service preparation"></button>
+                            <button class="btn glyphicon glyphicon-log-in" ng-click="ngSearch.sendToService(verse.BibleId, verse.BookId , verse.ChapterId, verse.VerseNo , verse.VerseText)" data-toggle="tooltip" data-placement="bottom" title="add to service preparation"></button>
                         </td>
                     </tr>
                 </table>

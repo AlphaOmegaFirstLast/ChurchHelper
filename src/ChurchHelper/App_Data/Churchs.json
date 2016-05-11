@@ -1,0 +1,38 @@
+﻿{
+  "churchList": [
+    {
+      "name": "Merryland",
+      "password": "church@merry",
+      "pastors": [
+        {
+          "name": "Hamdy"
+        },
+        {
+          "name": "Samy"
+        },
+        {
+          "name": "Nassif"
+        }
+      ]
+
+    }
+    ,
+
+    {
+      "name": "Manshyat El Sadr",
+      "password": "church@man",
+      "pastors": [
+        {
+          "name": "Youssef"
+        }
+        ,
+        {
+          "name": "Samuel"
+        }
+      ]
+
+    }
+
+  ]
+
+}

@@ -1,10 +1,14 @@
 ﻿<div ng-controller="controllerService as ngService">
     <button class="btn btn-do" ng-click="ngService.startDisplay(1)">Display Service</button>
-
+    <button class="btn btn-do" ng-click="ngService.newService(1)">New Service</button>
+    
     <table class="table biblebook-striped biblebook-hover table-bordered block">
-        <tr ng-repeat="item in ngService.arDisplay">
+        <tr ng-repeat="item in ngService.arDisplay track by $index">
+            <td><select class="form-control input-sm" style="width: auto" ng-model="item.serviceOption" ng-options="op.caption for op in ngService.serviceOptions" ng-init="item.serviceOption= ngService.selectedServiceOption[0]" /></td>
             <td>{{item.label}}</td>
-            <td>{{item.text}}</td>
+            <td style="width: 100%;"><input type="text" class="form-control block"  style="max-width: 100%; width: 100%;" ng-model="item.text"></td>
+            <td><button class="btn glyphicon glyphicon-plus" ng-click="ngService.newItem($index)"></button></td>
+            <td><button class="btn glyphicon glyphicon-minus" ng-click="ngService.deleteItem($index)"></button></td>
         </tr>
     </table>
 

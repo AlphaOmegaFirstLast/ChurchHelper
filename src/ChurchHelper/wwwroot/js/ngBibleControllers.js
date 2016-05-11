@@ -5,16 +5,16 @@
 app.run(["serviceApiCalls", "$rootScope", function (serviceApiCalls, $rootScope) {
 
     $rootScope.bibleStructures = null;
-    serviceApiCalls.getBibleStructure();
+    serviceApiCalls.getBibleStructure();  //get bible structure and raise event so everyone knows to update their structure.
 
-    $rootScope.typeOf = function (value) {
+    $rootScope.typeOf = function (value) {   //works with the directive stringToNumber
         return typeof value;
     };
 }]);
 /*---------------------------------------------------------------------------------------------------------
                                             Factory overrides ExceptionHandler
 --------------------------------------------------------------------------------------------------------- */
-app.factory('$exceptionHandler', function() {
+app.factory('$exceptionHandler', function() {   //override the default globalErrorHandler to log info
     return function(exception, cause) {
         $('#dvMessage').html ( "Angular error: " + decodeURI(exception.message) + " :" + cause + "<br/>" + exception.fileName.substring(exception.fileName.lastIndexOf('/')) + " :" + exception.lineNumber );
         $('#btnClearMessage').show();
@@ -23,38 +23,39 @@ app.factory('$exceptionHandler', function() {
 /*---------------------------------------------------------------------------------------------------------
                                             conrtoller Display
 --------------------------------------------------------------------------------------------------------- */
-app.controller('controllerDisplay', ["serviceDisplay", "serviceBibleSettings", function (serviceDisplay, serviceSettings) {
+app.controller('controllerDisplay', ["serviceDisplay", "serviceBibleSettings", '$scope', function (serviceDisplay, serviceSettings, $scope) {
     var me = this;
     this.publish = [];
     this.arDisplayData = [];
     this.selectedDisplay = [];
     this.titlePrefix = "";
+    this.iconId = "";
     this.step = 2;
     this.currentIndex = 1;
     this.fromIndex = 1;
     this.toIndex = this.fromIndex + this.step;
+    this.displaySets = {};
 
     // init ---------------------------------------------------------------------
     this.init = function () {                                             // serviceS will notify controllerDisplay if data, currentIndex or step have changed.
-        serviceDisplay.registerSubscriber(me.updateDisplaySubscriber); 
         serviceSettings.registerSubscriber(me.updateSettingsSubscriber);  // when bible translation changes, let us know
     }
     //---------------------------------------------------------------------------
-    this.updateDisplaySubscriber = function (msg) {
-        if (msg != null && msg == "dataChange") {
-            me.arDisplayData = serviceDisplay.arDisplayData;                     //update from serviceDisplay
-            me.currentIndex = serviceDisplay.currentIndex;
-            me.titlePrefix = serviceDisplay.titlePrefix;
-            me.setDisplayRange('start', me.currentIndex);
-        }
+    $scope.$on('serviceDisplay-displayDataChanged', function (event, obj) {
+        me.displaySets[obj.iconId] = obj;
+        me.arDisplayData = obj.data;                                //update from serviceDisplay
+        me.currentIndex = obj.index;
+        me.titlePrefix = obj.titlePrefix;
+        me.iconId = obj.iconId;
+        me.setDisplayRange('start', me.currentIndex);
+    });
 
-        if (msg !=null && msg == "switchTab") {
-            me.currentIndex = serviceDisplay.currentIndex;;
-            me.setDisplayRange('start', me.currentIndex);
-            $('#menuTabs a[href= "#divDisplay"]').tab("show");          // switch to display tab
-        }
-
-    };
+    $scope.$on('serviceDisplay-displayStarted', function (event, obj) {
+        me.currentIndex = obj.index;
+        me.setDisplayRange('start', me.currentIndex);
+        $("#spanIcon").removeClass().addClass(obj.iconId);
+        $('#menuTabs a[href= "#divDisplay"]').tab("show");          // switch to display tab
+    });
 
     this.updateSettingsSubscriber = function () {           
         var newStep = serviceSettings.settings.versesPerPage;       //update from serviceSettings  
@@ -119,38 +120,13 @@ app.controller('controllerBibleContents', ["serviceApiCalls", "serviceBibleSetti
     this.verses = [];
 
     me.current = { bibleId: 0 , book: { Id:0 , Name: "", ChapterCount: 1 }, chapter: 1, verse: 1, fromVerse: 1, toVerse: 1 };
-    var watchStructure = null;
 
-    // init ---------------------------------------------------------------------------------------------------
+    //---------------------------------------------------------------------------------------------------
     this.init = function () {
-
-        serviceSettings.registerSubscriber(me.updateSubscriber);  // when bible translation changes, let us know
-
-        //watch $rootScope.bibleStructures, when it gets populated then populate me.bibleStructure
-        watchStructure = $scope.$watch(function () {
-            return $rootScope.bibleStructures;
-        }, function () {
-            if ($rootScope.bibleStructures != null) {
-                me.getBibleStructure($rootScope.bibleStructures[0]);    //fill the controller objects with data from $rootScope
-                me.setBook(me.books[0], false);
-                watchStructure();                                       //after getting structure then clear watch - so code is not re-called
-            }
-        }, true);
-
+        // put any initialization code here. i call it at the end of the controller.  
     };
-    //----------------------------------------------------------------------------------------------------------
-    this.updateSubscriber = function () {       // subscribe to the service so it notifies us with any updates to the bible settings
-        var newBiblId = serviceSettings.settings.bibleId;
 
-        if (me.current.bibleId != newBiblId) {
-            me.current.bibleId = newBiblId ;
-            if ($rootScope.bibleStructures != null && $rootScope.bibleStructures[me.current.bibleId] != null) {
-                me.getBibleStructure($rootScope.bibleStructures[me.current.bibleId]);
-                me.setBook(me.current.book, true);
-            }
-        }
-    }
-    // display contents Events --------------------------------------------------------------------------------
+   // user Events --------------------------------------------------------------------------------
 
     this.getBibleStructure = function (data) {
         me.bibleStructure = data;
@@ -209,7 +185,7 @@ app.controller('controllerBibleContents', ["serviceApiCalls", "serviceBibleSetti
     this.clickVerse = function (verse)
     {
         me.current.verse = verse.VerseNo;
-        serviceDisplay.startDisplay(me.current.verse);
+        serviceDisplay.startDisplay(me.current.verse, "content");
     }
 
     this.getVersesOfChapter = function (data) {
@@ -218,7 +194,7 @@ app.controller('controllerBibleContents', ["serviceApiCalls", "serviceBibleSetti
         me.verses.forEach(function (resultVerse) {
             arDisplay.push({ label: resultVerse.VerseNo, text: resultVerse.VerseText });
         });
-        serviceDisplay.setDisplayData(arDisplay, me.current.verse, me.currentTitle());
+        serviceDisplay.setDisplayData(arDisplay, me.current.verse, me.currentTitle(), "content");
     };
 
     this.currentTitle = function () {
@@ -226,10 +202,35 @@ app.controller('controllerBibleContents', ["serviceApiCalls", "serviceBibleSetti
         return title;
     }
 
-    $scope.$on('goContext', function(event, obj) {
+    this.sendToService = function (bibleId, bookId, chapterId, verseNo, verseText) {
+        $rootScope.$broadcast('controllerBibleContents-sendToService', { bibleId: bibleId, bookId: bookId, bookName: me.current.book.Name, chapterId: chapterId, verseNo: verseNo, verseText: verseText });   //raise event to controllerBibleContent to handle (will make it to listen)
+    }
+
+    //Code events---------------------------------------------------------------------------------------------------
+
+    $scope.$on('serviceApiCalls-bibleStructurePopulated', function (event) {                     //handler to event raised by serviceBibleSettings
+        if ($rootScope.bibleStructures != null) {
+            me.getBibleStructure($rootScope.bibleStructures[0]);                                //fill the controller objects with data from $rootScope
+            me.setBook(me.books[0], false);
+        }
+    });
+
+    $scope.$on('serviceBibleSettings-bibleChanged', function (event, obj) {                     //handler to event raised by serviceBibleSettings
+        var newBiblId = obj.bibleId;
+
+        if (me.current.bibleId != newBiblId) {
+            me.current.bibleId = newBiblId;
+            if ($rootScope.bibleStructures != null && $rootScope.bibleStructures[me.current.bibleId] != null) {
+                me.getBibleStructure($rootScope.bibleStructures[me.current.bibleId]);
+                me.setBook(me.current.book, true);
+            }
+        }
+    });
+
+    $scope.$on('controllerSearch-goContext', function (event, obj) {
         me.current.book = me.getBookById(obj.bookId);  // same id different name in different language
         me.setChapter(obj.chapterId, obj.verseNo);
-        serviceDisplay.startDisplay(me.current.verse);
+        serviceDisplay.startDisplay(me.current.verse, "content");
     });
     //----------------------------------------------------------------------------------------------
 
@@ -255,31 +256,13 @@ app.controller('controllerSearch', ["serviceApiCalls", "serviceBibleSettings", "
     ];
     this.selectedSearchOption = this.searchOptions[0];
     this.pagination = {};
-
-    var watchStructure = null;
-
+    this.arDisplay = [];
+    //--------------------------------------------------------------------------------------------
     this.init = function () {
-        serviceSettings.registerSubscriber(me.updateSubscriber);  // when bible translation changes, let us know
-
-        watchStructure= $scope.$watch(function () {
-            return $rootScope.bibleStructures;
-        }, function () {
-            if ($rootScope.bibleStructures != null) {
-                me.bibleStructure = $rootScope.bibleStructures[0] ;
-                watchStructure(); //after getting structure then clear watch - so code is not re-called
-            }
-        }, true);
-
+        // put any initialization code here. i call it at the end of the controller.  
     };
 
-    this.updateSubscriber = function () {       // subscribe to the service so it notifies us with any updates to the bible settings
-        me.currentBibleId = parseInt(serviceSettings.settings.bibleId);
-        if ($rootScope.bibleStructures != null && $rootScope.bibleStructures[me.currentBibleId] != null) {
-            me.bibleStructure = $rootScope.bibleStructures[me.currentBibleId];
-        }
-    }
-
-    // Filter Events -------------------------------------------------------------------------------
+    // user Events -------------------------------------------------------------------------------
 
     this.clickBible = function () {
         me.bibleStructure.Selected = me.bibleStructure.Selected == 1 ? 0 : 1;        // toggle selection          
@@ -348,10 +331,11 @@ app.controller('controllerSearch', ["serviceApiCalls", "serviceBibleSettings", "
         });
         return bookName;
     }
+
     // Search Events -------------------------------------------------------------------------------
 
     this.doSearch = function (pageIndex) {
-        if (pageIndex == "." || pageIndex == "..") {
+        if (pageIndex == "." || pageIndex == "..") {   //pagination requesting page no
         } else {
             var data = { pageIndex: pageIndex, bibleIds: [me.currentBibleId], bibleFilter: me.bibleStructure, searchCriteria: { searchItems: [{ searchTerm: me.searchTerm }] } };
             var jsonData = angular.toJson(data);
@@ -363,33 +347,40 @@ app.controller('controllerSearch', ["serviceApiCalls", "serviceBibleSettings", "
     this.successDoSearch = function (data, pagination) {
         me.searchResult = data;
         me.pagination = pagination;
-        var arDisplay = [];
+        me.arDisplay = [];
         me.searchResult.forEach(function (resultVerse) {
-            arDisplay.push({ label: me.getBookName(resultVerse.BookId) + " " + resultVerse.ChapterId + " : " + resultVerse.VerseNo, text: resultVerse.VerseText });
+            me.arDisplay.push({ label: me.getBookName(resultVerse.BookId) + " " + resultVerse.ChapterId + " : " + resultVerse.VerseNo, text: resultVerse.VerseText });
         });
-        serviceDisplay.setDisplayData(arDisplay, 1, "Result Page : " + me.pagination.CurrentPage);
     };
+
+    this.getTranslations = function (bibleIds, bookId, chapterId, verseNo) {
+
+        var data = { bibleIds: [1, 2], bookId: bookId, chapterId: chapterId, verseNo: verseNo };
+        var jsonData = angular.toJson(data);
+
+        serviceApiCalls.GetVerseTranslations(jsonData, me.successGetTranslations);
+    }
+
+    this.successGetTranslations = function (data, pagination) {
+        var translationResult = data;
+        var arTranslation = [];
+        translationResult.forEach(function (resultVerse) {
+            arTranslation.push(resultVerse.VerseText);
+        });
+        alert(arTranslation);
+    };
+
 
     this.startDisplay = function (index) {
-        serviceDisplay.startDisplay(index);
+        serviceDisplay.setDisplayData(me.arDisplay, index, "search results page [" + me.pagination.CurrentPage + "]", "search");
+        serviceDisplay.startDisplay(index , "search");
     };
-
-    this.goContext = function (bookId, chapterId, verseNo) {
-        $rootScope.$broadcast('goContext', { bookId: bookId, chapterId: chapterId, verseNo: verseNo });   //raise event to controllerBibleContent to handle (will make it to listen)
-    };
-
-    this.getTranslations = function (bibleId, bookId, chapterId, verseNo) {
-        alert("getTranslations: " + bibleId + bookId + chapterId + verseNo);
-    }
-    this.sendToService = function (bibleId, bookId, chapterId, verseNo) {
-        alert("sendToService: " + bibleId + bookId + chapterId + verseNo);
-    }
 
     this.getPagination = function () {
         var arPages = [];
         var tooMany = me.pagination.TotalPageCount > 20;
         var buttonDone = false;
-        
+
         for (var i = 1; i <= me.pagination.TotalPageCount; i++) {
             if ((tooMany) && i > 4 && i <= (me.pagination.TotalPageCount - 4)) {
                 if (!buttonDone) {
@@ -403,14 +394,40 @@ app.controller('controllerSearch', ["serviceApiCalls", "serviceBibleSettings", "
 
         return arPages;
     }
-    //--------------------------------------------------------------------------------------
+
+    //Raise events ---------------------------------------------------------------------------------
+
+    this.goContext = function (bookId, chapterId, verseNo) {
+        $rootScope.$broadcast('controllerSearch-goContext', { bookId: bookId, chapterId: chapterId, verseNo: verseNo });   //raise event to controllerBibleContent to handle (will make it to listen)
+    };
+
+    this.sendToService = function (bibleId, bookId, chapterId, verseNo, verseText) {
+        $rootScope.$broadcast('controllerSearch-sendToService', { bibleId: bibleId, bookId: bookId, bookName: me.getBookName(bookId), chapterId: chapterId, verseNo: verseNo, verseText: verseText });   //raise event to controllerBibleContent to handle (will make it to listen)
+    }
+
+    //Code events ----------------------------------------------------------------------------------
+
+    $scope.$on('serviceApiCalls-bibleStructurePopulated', function (event) {                     //handler to event raised by serviceBibleSettings
+        if ($rootScope.bibleStructures != null) {
+            me.bibleStructure = $rootScope.bibleStructures[0];
+        }
+    });
+
+    $scope.$on('serviceBibleSettings-bibleChanged', function (event, obj) {                     //handler to event raised by serviceBibleSettings
+        me.currentBibleId = parseInt(obj.bibleId);
+
+        if ($rootScope.bibleStructures != null && $rootScope.bibleStructures[me.currentBibleId] != null) {
+            me.bibleStructure = $rootScope.bibleStructures[me.currentBibleId];
+        }
+    });
+    //--------------------------------------------------------------------------------------------
 
     this.init();
 }]);
 /*---------------------------------------------------------------------------------------------------------
                                             controller StyleSettings
 --------------------------------------------------------------------------------------------------------- */
-app.controller('controllerStyles', ["serviceStyleSettings", function (serviceSettings) {
+app.controller('controllerStyles', ["serviceStyleSettings","$scope", function (serviceSettings,$scope) {
 
     var me = this;
     this.settings = {};
@@ -418,15 +435,14 @@ app.controller('controllerStyles', ["serviceStyleSettings", function (serviceSet
     this.visibleContentRight = false;
 
     this.init = function () {
-        serviceSettings.registerSubscriber(me.updateSubscriber);
         serviceSettings.initSettings();
     };
 
-    this.updateSubscriber = function () { // read from serviceSettings
-        me.settings = serviceSettings.getSettings();
-        me.visibleContentLeft = (serviceSettings.settings.align == "left");
-        me.visibleContentRight = (serviceSettings.settings.align == "right");
-    }
+    $scope.$on('serviceStyleSettings-styleChanged', function (event, obj) {                     //handler to event raised by serviceStyleSettings
+        me.settings = obj.styleSettings;
+        me.visibleContentLeft = (me.settings.align == "left");
+        me.visibleContentRight = (me.settings.align == "right");
+    });
 
     this.clickSaveSettings = function () {
         serviceSettings.saveSettings();
@@ -435,6 +451,7 @@ app.controller('controllerStyles', ["serviceStyleSettings", function (serviceSet
     this.setFontSize = function () { // write to serviceSettings
         serviceSettings.setFontSize(me.settings.fontSize);
     }
+
     this.setBackgroundColor = function () { // write to serviceSettings
         serviceSettings.setBackgroundColor(me.settings.backgroundColor);
     }
@@ -469,13 +486,12 @@ app.controller("controllerBibleSettings", ["serviceBibleSettings", "$scope", fun
     this.bibles = [{ id: 1, name: "Van-Dyke" }, { id: 2, name: "KJV" }];
 
     this.init = function () {
-        serviceSettings.registerSubscriber(me.updateSubscriber);
         serviceSettings.initSettings();
     };
 
-    this.updateSubscriber = function () { // subscribe to & read from serviceSettings
-        me.settings = serviceSettings.getSettings();
-    }
+    $scope.$on('serviceBibleSettings-init', function(event, obj) {
+        me.settings = obj.settings;
+    });
 
     this.clickSaveSettings = function () {
         serviceSettings.saveSettings();
@@ -533,23 +549,52 @@ app.controller('controllerService', ["serviceApiCalls", "serviceBibleSettings", 
 
     var me = this;
     this.arDisplay = [];
+    this.serviceOptions = [
+      { id: 1, name: 'title', caption: 'Title' }
+    , { id: 2, name: 'verses', caption: 'Verses' }
+    , { id: 3, name: 'text', caption: 'Text' }
+    , { id: 4, name: 'separator', caption: 'Separator' }
+    , { id: 5, name: 'song', caption: 'Song' }
+    ];
+    
 
     this.init = function () {
-        me.FillData();
+        me.arDisplay.push({ text: "New Service Title", "serviceOption": me.serviceOptions[0] });
     };
 
-    this.FillData = function (d) {
-        
-        me.arDisplay.push({ text: "hello", label:"Hala" });
-        me.arDisplay.push({ text: "good", label: "Magdi" });
-        me.arDisplay.push({ text: "happy", label: "Abeer" });
+    this.newItem = function (index) {
+        var temp = [];
+        me.arDisplay.forEach(function (obj, i) {
+            if (i != index) {
+                temp.push(obj);
+            } else {
+                temp.push(obj);
+                temp.push({ "serviceOption": me.serviceOptions[0] });
+            }
+        });
+        me.arDisplay = temp;
+    };
+    this.deleteItem = function (index) {
+        var temp = [];
+        me.arDisplay.forEach(function (obj, i) {
+            if (i != index) {
+                temp.push(obj);
+            }
+        });
+        me.arDisplay = temp;
     };
 
     this.startDisplay = function (index) {
-        serviceDisplay.setDisplayData(me.arDisplay, 1, "Service");
-        serviceDisplay.startDisplay(index);
+        serviceDisplay.setDisplayData(me.arDisplay, 1, "service page [1]", "service");
+        serviceDisplay.startDisplay(index , "service");
     };
 
+    $scope.$on('controllerSearch-sendToService', function (event, obj) { //handler to event raised by serviceBibleSettings
+        me.arDisplay.push({ serviceOption: me.serviceOptions[0], label: obj.bookName + " " + obj.chapterId + ":" + obj.verseNo, text: obj.verseText, info: obj });
+    });
+    $scope.$on('controllerBibleContents-sendToService', function (event, obj) { //handler to event raised by serviceBibleSettings
+        me.arDisplay.push({ serviceOption: me.serviceOptions[0], label: obj.bookName + " " + obj.chapterId + ":" + obj.verseNo, text: obj.verseText, info: obj });
+    });
     //--------------------------------------------------------------------------------------
 
     this.init();

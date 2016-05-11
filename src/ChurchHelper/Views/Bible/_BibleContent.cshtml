@@ -38,6 +38,9 @@
                                     <td> {{verse.VerseNo}} </td>
                                     <td style="width: 100%"> {{verse.VerseText}} </td>
                                     <td style="vertical-align: middle;">
+                                        <button class="btn glyphicon glyphicon-log-in" ng-click="bible.sendToService(verse.BibleId, verse.BookId , verse.ChapterId, verse.VerseNo , verse.VerseText)" data-toggle="tooltip" data-placement="bottom" title="add to service preparation"></button>
+                                    </td>
+                                    <td style="vertical-align: middle;">
                                         <button class="btn glyphicon glyphicon-unchecked" ng-click="bible.clickVerse(verse)"></button>
                                     </td>
                                 </tr>
@@ -65,6 +68,9 @@
                                 <tr ng-repeat="verse in bible.verses" ng-dblclick="bible.clickVerse(verse)">
                                     <td style="vertical-align: middle;">
                                         <button class="btn glyphicon glyphicon-unchecked" ng-click="bible.clickVerse(verse)" data-placement="bottom" title="go to display"></button>
+                                    </td>
+                                    <td style="vertical-align: middle;">
+                                        <button class="btn glyphicon glyphicon-log-in" ng-click="bible.sendToService(verse.BibleId, verse.BookId , verse.ChapterId, verse.VerseNo , verse.VerseText)" data-toggle="tooltip" data-placement="bottom" title="add to service preparation"></button>
                                     </td>
                                     <td style="width: 100%"> {{verse.VerseText}} </td>
                                     <td> {{verse.VerseNo}} </td>

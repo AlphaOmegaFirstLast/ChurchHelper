@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ChurchHelper.BusinessDto;
 using ChurchHelper.BusinessInterfaces;
 using ChurchHelper.BusinessModels;
 using ChurchHelper.SystemModels;
@@ -36,6 +37,13 @@ namespace ChurchHelper.Controllers
         public async Task<ApiResponse<List<BibleVerse>>> GetVersesOfChapter(int bibleId, int bookId, int chapterId)
         {
             return await _bibleManager.GetVersesOfChapter(bibleId, bookId, chapterId);
+        }
+
+        [HttpPost]
+        [Route("apiBible/GetVerseTranslations")]
+        public async Task<ApiResponse<List<BibleVerse>>> GetVerseTranslations([FromBody]RequestVerseTranslations request)
+        {
+            return await _bibleManager.GetVerseTranslations(request.BibleIds, request.BookId, request.ChapterId, request.VerseNo);
         }
 
         [HttpPost]

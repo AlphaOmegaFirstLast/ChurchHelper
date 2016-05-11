@@ -5,10 +5,10 @@
             <tr>
                 <td>
                     <button type="button" class="btn btn-default" ng-click="ngDisplay.setDisplayRange('back')">
-                        <span class="glyphicon glyphicon-arrow-left icon-next" aria-hidden="true"></span>
+                        <span class="glyphicon glyphicon-arrow-left icon-next"  aria-hidden="true"></span>
                     </button>
                 </td>
-                <td style="width: 100%; text-align: center">{{ngDisplay.currentTitle()}}</td>
+                <td style="width: 100%; text-align: center"><span id="spanIcon" style="margin-left: 5px; margin-right: 5px;" aria-hidden="true"></span>{{ngDisplay.currentTitle()}}</td>
                 <td>
                     <button type="button" class="btn btn-default" ng-click="ngDisplay.setDisplayRange('next')">
                         <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>

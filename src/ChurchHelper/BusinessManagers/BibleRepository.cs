@@ -79,15 +79,53 @@ namespace ChurchHelper.BusinessManagers
 
             var query = string.Empty;
             query = query + "( ";
-            query = query + " query: (bool: (";
-            query = query + " must : [  ( term : ( 'BibleId': {0}) ), ( term : ( 'BookId': '{1}') ), ( term : ( 'ChapterId': '{2}') )]";
+            query = query + " 'query': ('bool': (";
+            query = query + " 'must' : [  ( 'term' : ( 'BibleId': {0}) ), ( 'term' : ( 'BookId': '{1}') ), ( 'term' : ( 'ChapterId': '{2}') )]";
             query = query + ")) ";
-            query = query + ", sort : [ 'BibleId' , 'BookId' , 'ChapterId' , 'VerseNo' ]";
-            query = query + ", from : {3} ";
-            query = query + ", size : {4} ";
+            query = query + ", 'sort' : [ 'BibleId' , 'BookId' , 'ChapterId' , 'VerseNo' ]";
+            query = query + ", 'from' : {3} ";
+            query = query + ", 'size' : {4} ";
             query = query + ")";
 
             query = string.Format(query, bibleId, bookId.ToString("00"), chapterId.ToString("000"), 0, 1000);
+
+            query = query.Replace("(", "{").Replace(")", "}").Replace("'", "\"");
+
+            var endpoint = new EndPoint();
+            endpoint.ApiMethod = _readIndex + "_search";
+            endpoint.HttpMethod = "POST";
+
+            var esResponse = await _requestManager.ExecuteRequest<ElasticSearchResponse<ElasticSearchBibleDocument>, string>(endpoint, query);
+            if (esResponse.Status.Ok)
+            {
+                response.Data = new List<BibleVerse>();
+                foreach (var hit in esResponse.Data.hits.hits)
+                {
+                    var verse = new BibleVerse() { VerseNo = Convert.ToInt16(hit._source.VerseNo), VerseText = hit._source.VerseText };
+                    response.Data.Add(verse);
+                }
+            }
+            else
+            {
+                response.Status = esResponse.Status;
+            }
+            return response;
+        }
+        public async Task<ApiResponse<List<BibleVerse>>> GetDocuments(int[] bibleIds, int bookId, int chapterId, int verseNo)
+        {
+            var response = new ApiResponse<List<BibleVerse>>();
+
+            var query = string.Empty;
+            query = query + "( ";
+            query = query + " 'query' : ('bool': (";
+            query = query + " 'must'  : [ ( 'term' : ( 'BookId': '{0}') ), ( 'term' : ( 'ChapterId': '{1}')) , ( 'term' : ( 'VerseNo': '{2}')) ]";
+            query = query + ")) ";
+            query = query + ", 'sort' : [ 'BibleId' , 'BookId' , 'ChapterId' , 'VerseNo' ]";   //todo filter by bibleIds
+            query = query + ", 'from' : {3} ";
+            query = query + ", 'size' : {4} ";
+            query = query + ")";
+
+            query = string.Format(query, bookId.ToString("00"), chapterId.ToString("000"), verseNo.ToString("000"), 0,1000);
 
             query = query.Replace("(", "{").Replace(")", "}").Replace("'", "\"");
 
@@ -126,29 +164,29 @@ namespace ChurchHelper.BusinessManagers
             }
 
             var filterItems = GetFilter(bibleIds , bibleFilter);
-            var mustNotClause = string.Empty;
-            var filter = string.Empty;
 
-            var searchStart     =  $" ( ";
-            var boolQueryStart  =  $" query: ( bool: (";
-            var mustClause      =  $"   must     : [ (wildcard : ('SearchText' :  '*{searchTerm}*' )) ]";
-            if (!string.IsNullOrEmpty(filterItems.Item2))
-            {
-                mustNotClause = $" , must_not : [ {filterItems.Item2} ]";
-            }
-            var boolQueryEnd    =  $" )) ";
-            if (!string.IsNullOrEmpty(filterItems.Item1))
-            {
-                filter = $" , filter: ( or : [ {filterItems.Item1} ] ) ";
-            }
-            var sort            =  $" , sort : ['BookId' , 'ChapterId' , 'VerseNo' ]"; 
-            var from            =  $" , from : {startIndex} ";
-            var size            =  $" , size : {recPerPage} ";
+            var searchStart         =  $" ( ";
+
+            var boolQueryStart      =  $" 'query' : ( 'bool' : (";
+            var queryMustClause     =  $"   'must'     : [ ('wildcard' : ('SearchText' :  '*{searchTerm}*' )) ]";  // must works like and
+            var boolQueryEnd        =  $" )) ";
+
+            var boolFilterStart     = $" , 'filter'   : ( 'bool' : (";
+            var filterShouldClause  = $"   'should'   : [] ";       //should works like or
+            var filterMustClause    = $" , 'must'     : [ {filterItems.Item1} ] ";         //must works like and   
+            var filterMustNotClause = $" , 'must_not' : [ {filterItems.Item2} ]";     //must_not works like and not
+            var boolFilterEnd       = $" )) ";
+
+            var sort            =  $" , 'sort' : ['BookId' , 'ChapterId' , 'VerseNo' ]"; 
+            var from            =  $" , 'from' : {startIndex} ";
+            var size            =  $" , 'size' : {recPerPage} ";
+
             var searchEnd       =  $" ) ";
 
-            var boolQuery = $" {boolQueryStart} {mustClause} {mustNotClause} {boolQueryEnd}";
+            var boolQuery  = $" {boolQueryStart}  {queryMustClause} {boolQueryEnd} ";
+            var boolFilter = $" {boolFilterStart} {filterShouldClause} {filterMustClause} {filterMustNotClause} {boolFilterEnd} ";
 
-            var query = $"{searchStart} {boolQuery} {filter} {sort} {from} {size} {searchEnd} ";
+            var query = $"{searchStart} {boolQuery} {boolFilter} {sort} {from} {size} {searchEnd} ";
             query = query.Replace("(", "{").Replace(")", "}").Replace("'", "\"");
 
             var endpoint = new EndPoint();
@@ -193,8 +231,11 @@ namespace ChurchHelper.BusinessManagers
 
         private Tuple<string, string> GetFilter(List<int> bibleIds, Bible bibleFilter)
         {
-            var mustFilter = new StringBuilder();
             var mustNotFilter = new StringBuilder();
+            var shouldBooks = new StringBuilder();
+            var shouldGroups = new StringBuilder();
+            var shouldTestments = new StringBuilder();
+            var shouldBibles = new StringBuilder();
 
             foreach (var testment in bibleFilter.Testments)
             {
@@ -214,16 +255,17 @@ namespace ChurchHelper.BusinessManagers
                 testment.Selected = unSelectedGroups == testment.Groups.Count() ? 0 : testment.Selected;
 
             }
-
+            // (book1 or book2 or book 3) and (group1 or group2) and (testment1 or testment2) and (bible1 or bible2)
+            // bool : must [bool:shouldBook , bool:shouldGroup , bool:shouldTestment , bool:shouldBible]
             foreach (var testment in bibleFilter.Testments)
             {
                 switch (testment.Selected)
                 {
                     case 0:
-                        mustNotFilter.Append($" , ( term : ('TestmentId':'{testment.Id}') )");
+                        mustNotFilter.Append($" , ( 'term' : ('TestmentId':'{testment.Id}') )");
                         break;
                     case 1:
-                        mustFilter.Append($" , ( term : ('TestmentId':'{testment.Id}') )");
+                        shouldTestments.Append($" , ( 'term' : ('TestmentId':'{testment.Id}') )");
                         break;
                     default: //if selected = 2 which is partially selected
                         foreach (var group in testment.Groups)
@@ -231,10 +273,10 @@ namespace ChurchHelper.BusinessManagers
                             switch (group.Selected)
                             {
                                 case 0:
-                                    mustNotFilter.Append($" , ( term : ('GroupId':'{ group.Id}') )");
+                                    mustNotFilter.Append($" , ( 'term' : ('GroupId':'{ group.Id}') )");
                                     break;
                                 case 1:
-                                    mustFilter.Append($" , ( term : ('GroupId':'{ group.Id}') )");
+                                    shouldGroups.Append($" , ( 'term' : ('GroupId':'{ group.Id}') )");
                                     break;
                                 default:
                                     foreach (var book in group.Books)
@@ -242,10 +284,10 @@ namespace ChurchHelper.BusinessManagers
                                         switch (book.Selected)
                                         {
                                             case 0:
-                                                mustNotFilter.Append($" , ( term : ('BookId':'{book.Id}') )");
+                                                mustNotFilter.Append($" , ( 'term' : ('BookId':'{book.Id}') )");
                                                 break;
                                             case 1:
-                                                mustFilter.Append($" , ( term : ('BookId':'{book.Id}') )");
+                                                shouldBooks.Append($" , ( 'term' : ('BookId':'{book.Id}') )");
                                                 break;
                                         }
                                     }
@@ -257,18 +299,35 @@ namespace ChurchHelper.BusinessManagers
             }
             foreach (var bibleId in bibleIds)
             {
-                mustFilter.Append($" , ( term : ('BibleId':'{bibleId}') )");
+                shouldBibles.Append($" , ( 'term' : ('BibleId':'{bibleId}') )");
             }
-            var smustFilter = mustFilter.ToString();
-            if (!string.IsNullOrEmpty(smustFilter))
-                smustFilter = smustFilter.Substring(2);
+            //----------------------------------------------
+            // convert strinBuilders to strings and remove the first space and colon
 
-            var smustNotFilter = mustNotFilter.ToString();
-            if (!string.IsNullOrEmpty(smustNotFilter))
+            var sShouldBibles = getCleanString(shouldBibles.ToString());
+            var shouldFilter = getCleanString (shouldBooks.ToString() + shouldGroups.ToString() + shouldTestments.ToString());
+            //----------------------------------------------
 
-                smustNotFilter = smustNotFilter.Substring(2);
+            if (!string.IsNullOrEmpty(shouldFilter))
+                shouldFilter = $" , ('bool':('should':[{shouldFilter}] ))";
+
+            if (!string.IsNullOrEmpty(sShouldBibles))
+                sShouldBibles = $" , ('bool':('should':[{sShouldBibles}] ))";
+
+            var smustFilter = shouldFilter + sShouldBibles ;
+            smustFilter = getCleanString(smustFilter);
+
+            var smustNotFilter = getCleanString(mustNotFilter.ToString());
 
             return Tuple.Create(smustFilter, smustNotFilter);
+        }
+
+        private string getCleanString(string s)
+        {
+  
+            if (!string.IsNullOrEmpty(s))
+                s = s.Substring(2);   // remove the first space and colon
+            return s;
         }
 
     }
