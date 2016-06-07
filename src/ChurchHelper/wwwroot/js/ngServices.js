@@ -5,13 +5,13 @@
                                                 Service Api Call
     --------------------------------------------------------------------------------------------------------- */
     app.service('serviceApiCalls', ['$http', '$rootScope', function ($http, $rootScope) {
-        var apiPath = "http://localhost:54379/apiBible/"; // "http://churchhelper.azurewebsites.net/apiBible/"; 
+        var apiPath = "http://localhost:54379/"; // "http://churchhelper.azurewebsites.net/apiBible/"; 
         //--------------------------------------------------------------------------------------
         var me = this;
 
         this.getBibleStructure = function () { // get bible structure in 2 lang once at the begining of the angular app
 
-            $http.get(apiPath + "GetBibleStructure")
+            $http.get(apiPath + "apiBible/GetBibleStructure")
                 .then(function (response) {
                     var apiResponse = response.data;
                     if (apiResponse.Status.Ok) {
@@ -28,7 +28,7 @@
         //--------------------------------------------------------------------------------------
         this.getVerseOfChapter = function (bibleId, bookId, chapterId, callBack) {
 
-            $http.get(apiPath + "GetVersesOfChapter/" + bibleId + "/" + bookId + "/" + chapterId)
+            $http.get(apiPath + "apiBible/GetVersesOfChapter/" + bibleId + "/" + bookId + "/" + chapterId)
                 .then(function (response) {
                     var apiResponse = response.data;
                     if (apiResponse.Status.Ok) {
@@ -41,7 +41,7 @@
         //--------------------------------------------------------------------------------------
         this.getVerseInBibles = function (bookId, chapterId, verseNo, callBack) {
 
-            $http.get(apiPath + "GetVerseInBibles/" + bookId + "/" + chapterId + "/" + verseNo)
+            $http.get(apiPath + "apiBible/GetVerseInBibles/" + bookId + "/" + chapterId + "/" + verseNo)
                 .then(function (response) {
                     var apiResponse = response.data;
                     if (apiResponse.Status.Ok) {
@@ -54,7 +54,7 @@
         //--------------------------------------------------------------------------------------
         this.GetVerseTranslations = function (jsonData, callBack) {
 
-            $http.post(apiPath + "GetVerseTranslations", jsonData)
+            $http.post(apiPath + "apiBible/GetVerseTranslations", jsonData)
                 .then(function (response) {
                     var apiResponse = response.data;
                     if (apiResponse.Status.Ok) {
@@ -67,7 +67,46 @@
         //--------------------------------------------------------------------------------------
         this.doSearch = function (jsonData, callBack) {
 
-            $http.post(apiPath + "DoSearch", jsonData)
+            $http.post(apiPath + "apiBible/DoSearch", jsonData)
+                .then(function (response) {
+                    var apiResponse = response.data;
+                    if (apiResponse.Status.Ok) {
+                        callBack(apiResponse.Data, apiResponse.Pagination);
+                    } else {
+                        me.failureApiCall(apiResponse);
+                    }
+                }, this.failureHttpRequest);
+        }
+        //--------------------------------------------------------------------------------------
+        this.savePresentation = function (jsonData, callBack) {
+
+            $http.post(apiPath + "apiPresentation/SavePresentation", jsonData)
+                .then(function (response) {
+                    var apiResponse = response.data;
+                    if (apiResponse.Status.Ok) {
+                        callBack(apiResponse.Data, apiResponse.Pagination);
+                    } else {
+                        me.failureApiCall(apiResponse);
+                    }
+                }, this.failureHttpRequest);
+        }
+        //--------------------------------------------------------------------------------------
+        this.GetPresentationById = function (jsonData, callBack) {
+
+            $http.post(apiPath + "apiPresentation/GetPresentationById", jsonData)
+                .then(function (response) {
+                    var apiResponse = response.data;
+                    if (apiResponse.Status.Ok) {
+                        callBack(apiResponse.Data, apiResponse.Pagination);
+                    } else {
+                        me.failureApiCall(apiResponse);
+                    }
+                }, this.failureHttpRequest);
+        }
+        //--------------------------------------------------------------------------------------
+        this.GetPresentationByWriter = function (jsonData, callBack) {
+
+            $http.post(apiPath + "apiPresentation/GetPresentationByWriter", jsonData)
                 .then(function (response) {
                     var apiResponse = response.data;
                     if (apiResponse.Status.Ok) {
@@ -99,15 +138,19 @@
 
         this.setDisplayData = function (data, index, titlePrefix, id) {
             var iconId = "";
+            var intId = 0;
             switch (id) {
                 case "content":
                     iconId = "glyphicon glyphicon-book icon-next";
+                    intId = 0;
                     break;
                 case "search":
                     iconId = "glyphicon glyphicon-search icon-next";
+                    intId = 1;
                     break;
                 case "service":
                     iconId = "glyphicon glyphicon-edit icon-next";
+                    intId = 2;
                     break;
             }
             var displayObj = { id: id, data: data, index: index, titlePrefix: titlePrefix, iconId: iconId };
@@ -128,7 +171,7 @@
     app.service('serviceBibleSettings', ['$rootScope', function ($rootScope) {
         var me = this;
         this.publish = [];
-        this.settings = { versesPerPage: 2, bibleId: 1, align: "right", language: "arabic" };
+        this.settings = { itemsPerPage: 2, bibleId: 1, align: "right", language: "arabic" };
 
         this.registerSubscriber = function (callback) {
             me.publish.push(callback);
@@ -147,8 +190,8 @@
             setCookie("bibleSettings", JSON.stringify(me.settings), 1000);
         }
 
-        this.setVersesPerPage = function (versesPerPage) {
-            me.settings.versesPerPage = versesPerPage;
+        this.setItemsPerPage = function (itemsPerPage) {
+            me.settings.itemsPerPage = itemsPerPage;
             me.publish.forEach(function (p) {
                 p();
             });
@@ -169,7 +212,6 @@
             }
         }
     }]);
-
     /*---------------------------------------------------------------------------------------------------------
                                                 service StyleSettings
     --------------------------------------------------------------------------------------------------------- */

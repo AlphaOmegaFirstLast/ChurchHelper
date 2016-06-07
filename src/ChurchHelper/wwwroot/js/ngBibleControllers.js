@@ -25,84 +25,87 @@ app.factory('$exceptionHandler', function() {   //override the default globalErr
 --------------------------------------------------------------------------------------------------------- */
 app.controller('controllerDisplay', ["serviceDisplay", "serviceBibleSettings", '$scope', function (serviceDisplay, serviceSettings, $scope) {
     var me = this;
-    this.publish = [];
-    this.arDisplayData = [];
-    this.selectedDisplay = [];
-    this.titlePrefix = "";
-    this.iconId = "";
+    this.displayItems = [];
+    this.displaySets = {};
+    this.currentDisplaySetId = "";
+    this.currentDisplaySet = { id: "", data: [], index: 1, titlePrefix: "", iconId: "" };
+
     this.step = 2;
-    this.currentIndex = 1;
     this.fromIndex = 1;
     this.toIndex = this.fromIndex + this.step;
-    this.displaySets = {};
-
+    
     // init ---------------------------------------------------------------------
     this.init = function () {                                             // serviceS will notify controllerDisplay if data, currentIndex or step have changed.
         serviceSettings.registerSubscriber(me.updateSettingsSubscriber);  // when bible translation changes, let us know
     }
     //---------------------------------------------------------------------------
     $scope.$on('serviceDisplay-displayDataChanged', function (event, obj) {
-        me.displaySets[obj.iconId] = obj;
-        me.arDisplayData = obj.data;                                //update from serviceDisplay
-        me.currentIndex = obj.index;
-        me.titlePrefix = obj.titlePrefix;
-        me.iconId = obj.iconId;
-        me.setDisplayRange('start', me.currentIndex);
+        me.currentDisplaySetId = obj.id;
+        me.displaySets[me.currentDisplaySetId] = obj;
+        me.currentDisplaySet = obj ;
+        me.setDisplayData();
     });
 
     $scope.$on('serviceDisplay-displayStarted', function (event, obj) {
-        me.currentIndex = obj.index;
-        me.setDisplayRange('start', me.currentIndex);
-        $("#spanIcon").removeClass().addClass(obj.iconId);
+        me.currentDisplaySetId = obj.id;
+        me.currentDisplaySet = me.displaySets[me.currentDisplaySetId];
+        me.currentDisplaySet.index = obj.index;
+        me.setDisplayData();
         $('#menuTabs a[href= "#divDisplay"]').tab("show");          // switch to display tab
     });
 
     this.updateSettingsSubscriber = function () {           
-        var newStep = serviceSettings.settings.versesPerPage;       //update from serviceSettings  
+        var newStep = serviceSettings.settings.itemsPerPage;       //update from serviceSettings  
 
         if (me.step != newStep) {
             me.step = parseInt(newStep);
-            me.setDisplayRange('start', me.currentIndex);
+            me.setDisplayRange('start', me.currentDisplaySet.index);
         }
     };
 
-    this.setStartDisplay = function (index) {
-        me.currentIndex = index;                    // in this case verse number = verse index
-        me.setDisplayRange('start', me.currentIndex);
-    }
+    this.displaySetChanged = function() {
+        me.displaySets[me.currentDisplaySet.id].index = me.currentDisplaySet.index;   // maintain index value among datasets switches
+        me.currentDisplaySet = me.displaySets[me.currentDisplaySetId];
+        me.setDisplayData();
+
+    };
+
+    this.setDisplayData = function() {
+        me.setDisplayRange('start', me.currentDisplaySet.index);
+        $("#spanIcon").removeClass().addClass(me.currentDisplaySet.iconId);
+    };
 
     this.setDisplayRange = function (operation, startIndex) {  // operation : start | next | back
         var minIndex = 1;
-        var maxIndex = me.arDisplayData.length;
+        var maxIndex = me.currentDisplaySet.data.length;
         var myCurrentIndex = startIndex ? parseInt(startIndex) : minIndex;  // if startIndex==null then take minVerse
 
         if (operation == 'next') {
-            myCurrentIndex = me.currentIndex + me.step;
+            myCurrentIndex = me.currentDisplaySet.index + me.step;
         }
         if (operation == 'back') {
-            myCurrentIndex = me.currentIndex - me.step;
+            myCurrentIndex = me.currentDisplaySet.index - me.step;
         }
         myCurrentIndex = myCurrentIndex < minIndex ? minIndex : myCurrentIndex;
         myCurrentIndex = myCurrentIndex > maxIndex ? maxIndex : myCurrentIndex;
 
-        me.currentIndex = myCurrentIndex;
+        me.currentDisplaySet.index = myCurrentIndex;
         me.fromIndex = myCurrentIndex;
         me.toIndex = myCurrentIndex + me.step - 1;
 
         if (me.toIndex > maxIndex) me.toIndex = maxIndex;
         // --------------- display items ------------------------
-        me.selectedDisplay = [];
+        me.displayItems = [];
         for (var i = me.fromIndex - 1; i <= me.toIndex - 1; i++) {
-            me.selectedDisplay.push(me.arDisplayData[i]);
+            me.displayItems.push(me.currentDisplaySet.data[i]);
         }
-
     }
 
     this.currentTitle = function () {
         if (me.fromIndex == me.toIndex) {
-            return me.titlePrefix + " : " + me.fromIndex;
+            return me.fromIndex;
         } else {
-            return me.titlePrefix + " : " + me.fromIndex + " - " + me.toIndex;
+            return me.fromIndex + " - " + me.toIndex;
         }
     }
 
@@ -192,7 +195,7 @@ app.controller('controllerBibleContents', ["serviceApiCalls", "serviceBibleSetti
         me.verses = data;
         var arDisplay = [];
         me.verses.forEach(function (resultVerse) {
-            arDisplay.push({ label: resultVerse.VerseNo, text: resultVerse.VerseText });
+            arDisplay.push({ TextBefore: resultVerse.VerseNo, ItemText: resultVerse.VerseText , Align:"inherit" });
         });
         serviceDisplay.setDisplayData(arDisplay, me.current.verse, me.currentTitle(), "content");
     };
@@ -349,7 +352,7 @@ app.controller('controllerSearch', ["serviceApiCalls", "serviceBibleSettings", "
         me.pagination = pagination;
         me.arDisplay = [];
         me.searchResult.forEach(function (resultVerse) {
-            me.arDisplay.push({ label: me.getBookName(resultVerse.BookId) + " " + resultVerse.ChapterId + " : " + resultVerse.VerseNo, text: resultVerse.VerseText });
+            me.arDisplay.push({ TextBefore: me.getBookName(resultVerse.BookId) + " " + resultVerse.ChapterId + " : " + resultVerse.VerseNo, ItemText: resultVerse.VerseText, Align:"inherit" });
         });
     };
 
@@ -500,8 +503,8 @@ app.controller("controllerBibleSettings", ["serviceBibleSettings", "$scope", fun
     this.setBibleId = function (bibleId) { // write to serviceSettings
         serviceSettings.setBibleId(bibleId);
     }
-    this.setVersesPerPage = function () { // write to serviceSettings
-        serviceSettings.setVersesPerPage(me.settings.versesPerPage);
+    this.setItemsPerPage = function () { // write to serviceSettings
+        serviceSettings.setItemsPerPage(me.settings.itemsPerPage);
     }
     //----------------------------------------------------------------
     this.init();
@@ -549,31 +552,32 @@ app.controller('controllerService', ["serviceApiCalls", "serviceBibleSettings", 
 
     var me = this;
     this.arDisplay = [];
-    this.serviceOptions = [
-      { id: 1, name: 'title', caption: 'Title' }
-    , { id: 2, name: 'verses', caption: 'Verses' }
-    , { id: 3, name: 'text', caption: 'Text' }
-    , { id: 4, name: 'separator', caption: 'Separator' }
-    , { id: 5, name: 'song', caption: 'Song' }
-    ];
-    
+    this.presentationFiles = [];
+    this.presentationHeader = { organization: "", writer: "", presentationId:"" };
 
+    this.itemTypes = ['Text', 'Verse', 'Song', 'Separator'];
+    this.itemAlignments = ['center', 'left', 'right'];
+
+    this.organizations = ['Merryland', 'Manshyat el sadr'];
+    this.writers = ['Suzette', 'Hamdy'];
+      
     this.init = function () {
-        me.arDisplay.push({ text: "New Service Title", "serviceOption": me.serviceOptions[0] });
+        me.arDisplay.push({ ItemText: "New Service Title", itemType: me.itemTypes[0].id });
     };
 
     this.newItem = function (index) {
         var temp = [];
         me.arDisplay.forEach(function (obj, i) {
-            if (i != index) {
+            if (i == index) {
                 temp.push(obj);
+                temp.push({ itemType: me.itemTypes[0].id });  //insert at index new item
             } else {
                 temp.push(obj);
-                temp.push({ "serviceOption": me.serviceOptions[0] });
             }
         });
         me.arDisplay = temp;
     };
+
     this.deleteItem = function (index) {
         var temp = [];
         me.arDisplay.forEach(function (obj, i) {
@@ -586,14 +590,61 @@ app.controller('controllerService', ["serviceApiCalls", "serviceBibleSettings", 
 
     this.startDisplay = function (index) {
         serviceDisplay.setDisplayData(me.arDisplay, 1, "service page [1]", "service");
-        serviceDisplay.startDisplay(index , "service");
+        serviceDisplay.startDisplay(index, "service");
+    };
+
+    this.newPresentation = function () {
+        me.arDisplay = [];
+    };
+
+    this.savePresentation = function (index) {
+        var presentation = { presentationHeader: { organisation: "Merryland", writer: "Suzette", id: "3" }, PresentationItems: me.arDisplay }
+        var presentationJson = angular.toJson(presentation);
+        serviceApiCalls.savePresentation(presentationJson, me.successSavePresentation);
+    };
+
+    this.successSavePresentation = function () {
+    };
+
+    this.findPresentation = function () {
+        var header = { organisation: me.presentationHeader.organization, writer: me.presentationHeader.writer };
+        var headerJson = angular.toJson(header);
+        serviceApiCalls.GetPresentationByWriter(headerJson, me.successFindPresentation);
+    };
+
+    this.successFindPresentation = function (data) {
+        me.presentationFiles = data;
+    };
+
+    this.getPresentation = function () {
+        var header = { organisation: me.presentationHeader.organization, writer: me.presentationHeader.writer, id: me.presentationHeader.presentationId };
+        var headerJson = angular.toJson(header);
+        serviceApiCalls.GetPresentationById(headerJson, me.successGetPresentation);
+    };
+
+    this.successGetPresentation = function (data) {
+        me.arDisplay = data.PresentationItems;
     };
 
     $scope.$on('controllerSearch-sendToService', function (event, obj) { //handler to event raised by serviceBibleSettings
-        me.arDisplay.push({ serviceOption: me.serviceOptions[0], label: obj.bookName + " " + obj.chapterId + ":" + obj.verseNo, text: obj.verseText, info: obj });
+        var presentationItem = {};
+        presentationItem.itemType = me.itemTypes[1].id;
+        presentationItem.ItemText = obj.verseText;
+        presentationItem.TextBefore = obj.bookName + " " + obj.chapterId + ":" + obj.verseNo;
+        presentationItem.TextAfter = "";
+        presentationItem.Align = me.itemAlignments[1];
+
+        me.arDisplay.push(presentationItem);
     });
     $scope.$on('controllerBibleContents-sendToService', function (event, obj) { //handler to event raised by serviceBibleSettings
-        me.arDisplay.push({ serviceOption: me.serviceOptions[0], label: obj.bookName + " " + obj.chapterId + ":" + obj.verseNo, text: obj.verseText, info: obj });
+        var presentationItem = {};
+        presentationItem.ItemType = me.itemTypes[1].id;
+        presentationItem.ItemText = obj.verseText;
+        presentationItem.TextBefore = obj.bookName + " " + obj.chapterId + ":" + obj.verseNo;
+        presentationItem.TextAfter = "";
+        presentationItem.Align = me.itemAlignments[2];
+
+        me.arDisplay.push(presentationItem);
     });
     //--------------------------------------------------------------------------------------
 

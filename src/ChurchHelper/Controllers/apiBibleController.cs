@@ -47,11 +47,13 @@ namespace ChurchHelper.Controllers
         }
 
         [HttpPost]
+        [Route("apiBible/DoSearch")]
         public async Task<ApiResponse<List<BibleVerse>>> DoSearch([FromBody]BibleSearch bibleSearch)
         {
             return await _bibleManager.DoSearch(bibleSearch);
         }
-
+        //-----------------------------------------------------------
+ 
         [HttpGet]
         [Route("apiBible/ReindexVanDyke")]
         public async Task<ApiResponse<string>> ReindexVanDyke()

@@ -43,6 +43,8 @@ namespace ChurchHelper
             services.AddTransient<ISerializer, NewtonSoftSerializer>();
             services.AddTransient<IRequestClient, RequestClient>();
             services.AddTransient<IRequestManager, RequestManager>();
+            services.AddTransient<ITextFileManager, TextFileManager>();
+            services.AddTransient<IPresentationManager, PresentationManger>();
             services.AddTransient<IBibleRepository, BibleRepository>();
             services.AddTransient<IBibleManager, BibleManager>();
         }

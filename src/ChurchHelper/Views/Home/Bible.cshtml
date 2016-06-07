@@ -16,7 +16,7 @@
                     <li><a role="tab" data-toggle="tab" href="#divSettings" aria-controls="settings">Settings</a></li>
 
                     <li style="float: right; margin-top: 3px;">
-                        <input class="form-control" style="width: 70px;" type="number" min="1" max="10" ng-change="bibleSettings.setVersesPerPage()" ng-model="bibleSettings.settings.versesPerPage" ng-init="bibleSettings.settings.versesPerPage" />
+                        <input class="form-control" style="width: 70px;" type="number" min="1" max="10" ng-change="bibleSettings.setItemsPerPage()" ng-model="bibleSettings.settings.itemsPerPage" ng-init="bibleSettings.settings.itemsPerPage" />
                     </li>
                     <li style="float: right; margin-top: 3px;">
                         <select class="form-control" ng-model="selectedItem" ng-change="bibleSettings.setBibleId(selectedItem)" ng-init="selectedItem='1'">
@@ -41,7 +41,7 @@
                 @Html.Partial("~/Views/Bible/_BibleSearch")
             </div>
             <div id="divService" class="tab-pane" role="tabpanel">
-                @Html.Partial("~/Views/Bible/_BibleService")
+                @Html.Partial("~/Views/Bible/_Presentation")
             </div>
             <div id="divSettings" class="tab-pane" role="tabpanel">
                 @Html.Partial("~/Views/Bible/_BibleSettings")

@@ -1,0 +1,41 @@
+﻿<div ng-controller="controllerService as ngPresentation">
+    <button class="btn btn-do" ng-click="ngPresentation.startDisplay(1)">Display Service</button>
+    <button class="btn btn-do" ng-click="ngPresentation.newPresentation()">New Service</button>
+    <button class="btn btn-do" ng-click="ngPresentation.savePresentation()">Save Service</button>
+    <button class="btn btn-do" ng-click="ngPresentation.getPresentation()">get Service</button>
+    <!-- ------------------------------------------------------------------------------------------------------------ -->
+    <select class="form-control input-sm" style="width: auto" ng-model="ngPresentation.presentationHeader.organization">
+        <option ng-repeat="option in ngPresentation.organizations" value="{{option}}">{{option}}</option>
+    </select>
+    <select class="form-control input-sm" style="width: auto" ng-model="ngPresentation.presentationHeader.writer">
+        <option ng-repeat="option in ngPresentation.writers" value="{{option}}">{{option}}</option>
+    </select>
+    <select class="form-control input-sm" style="width: auto" ng-model="ngPresentation.presentationHeader.presentationId">
+        <option ng-repeat="option in ngPresentation.presentationFiles" value="{{option}}">{{option}}</option>
+    </select>
+    <button class="btn btn-do" ng-click="ngPresentation.findPresentation()">find Service</button>
+    <!-- ------------------------------------------------------------------------------------------------------------ -->
+    <table class="table biblebook-striped biblebook-hover table-bordered block">
+        <tr ng-repeat="item in ngPresentation.arDisplay track by $index">
+            <td>
+                <select class="form-control input-sm" style="width: auto" ng-model="item.ItemType">
+                    <option ng-repeat="option in ngPresentation.itemTypes" value="{{option}}">{{option}}</option>
+                </select>
+            </td>
+            <td>
+                <select class="form-control input-sm" style="width: auto" ng-model="item.Align">
+                    <option ng-repeat="option in ngPresentation.itemAlignments" value="{{option}}">{{option}}</option>
+                </select>
+            </td>
+            <td>{{item.TextBefore}}</td>
+            <td style="width: 100%;">
+                <bdi>
+                    <input type="text" class="form-control block" style="max-width: 100%; width: 100%;" ng-model="item.ItemText">
+                </bdi>
+            </td>
+            <td><button class="btn glyphicon glyphicon-plus" ng-click="ngPresentation.newItem($index)"></button></td>
+            <td><button class="btn glyphicon glyphicon-minus" ng-click="ngPresentation.deleteItem($index)"></button></td>
+        </tr>
+    </table>
+
+</div>

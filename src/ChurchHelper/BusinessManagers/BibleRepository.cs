@@ -101,7 +101,7 @@ namespace ChurchHelper.BusinessManagers
                 response.Data = new List<BibleVerse>();
                 foreach (var hit in esResponse.Data.hits.hits)
                 {
-                    var verse = new BibleVerse() { VerseNo = Convert.ToInt16(hit._source.VerseNo), VerseText = hit._source.VerseText };
+                    var verse = new BibleVerse() {BibleId = hit._source.BibleId ,TestmentId = hit._source.TestmentId, BookId = hit._source.BookId, ChapterId = hit._source.ChapterId, VerseNo = Convert.ToInt16(hit._source.VerseNo), VerseText = hit._source.VerseText };
                     response.Data.Add(verse);
                 }
             }

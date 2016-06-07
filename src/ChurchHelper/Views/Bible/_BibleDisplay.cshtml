@@ -8,7 +8,13 @@
                         <span class="glyphicon glyphicon-arrow-left icon-next"  aria-hidden="true"></span>
                     </button>
                 </td>
-                <td style="width: 100%; text-align: center"><span id="spanIcon" style="margin-left: 5px; margin-right: 5px;" aria-hidden="true"></span>{{ngDisplay.currentTitle()}}</td>
+                <td style="width: 100%; text-align: center">
+                    <span id="spanIcon" style="margin-left: 5px; margin-right: 5px;" aria-hidden="true"></span>
+                    <select class="input-sm" style="width: auto; background-color: transparent;" ng-model="ngDisplay.currentDisplaySetId" ng-change="ngDisplay.displaySetChanged()">
+                        <option ng-repeat="option in ngDisplay.displaySets" value="{{option.id}}">{{option.titlePrefix}}</option>
+                    </select>
+                    {{ngDisplay.currentTitle()}}
+                </td>
                 <td>
                     <button type="button" class="btn btn-default" ng-click="ngDisplay.setDisplayRange('next')">
                         <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
@@ -25,9 +31,9 @@
 
             <table class="table table-condensed block">
 
-                <tr ng-repeat="item in ngDisplay.selectedDisplay">
-                    <td style="font-size: 12px;">{{item.label}}.</td>
-                    <td style="width: 100%;">{{item.text}}</td>
+                <tr ng-repeat="item in ngDisplay.displayItems">
+                    <td style="font-size: 12px;">{{item.TextBefore}}.</td>
+                    <td style="width: 100%; text-align:{{item.Align}}" ><bdi>{{item.ItemText}}</bdi></td>
                 </tr>
             </table>
         </div>

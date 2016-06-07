@@ -10,5 +10,6 @@ namespace ChurchHelper.SystemModels
         public string ElasticSearchReadIndex { get; set; }
         public string ElasticSearchWriteIndex { get; set; }
         public string ApiPath { get; set; }
+        public string PresentationPath { get; set; }
     }
 }

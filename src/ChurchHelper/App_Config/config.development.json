@@ -2,6 +2,7 @@
   "Config": {
     "ElasticSearchReadIndex": "http://user:bitnami@13.73.108.39:80/elasticsearch/bibles/",
     "ElasticSearchWriteIndex": "http://user:bitnami@13.73.108.39:80/elasticsearch/bibles/NKJV/",
-    "ApiPath": "http://localhost:54379/apiBible/"
+    "ApiPath": "http://localhost:54379/apiBible/",
+    "PresentationPath" :  "c:\\BiblePresentations"
   }
 }
